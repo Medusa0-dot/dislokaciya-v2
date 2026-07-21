@@ -1,6 +1,5 @@
-// === SERVICE WORKER ДЛЯ ДИСЛОКАЦИИ ВБФ ===
+// === SERVICE WORKER ДЛЯ ДИСЛОКАЦИИ ВБФ v2 ===
 const CACHE_NAME = 'dislokaciya-v2';
-const QUEUE_KEY = 'queue-data';
 
 // Установка Service Worker
 self.addEventListener('install', (event) => {
@@ -20,7 +19,7 @@ self.addEventListener('activate', (event) => {
 
 // === BACKGROUND SYNC ===
 self.addEventListener('sync', (event) => {
-  console.log(' Background Sync запущен, тег:', event.tag);
+  console.log('🔄 Background Sync запущен, тег:', event.tag);
   
   if (event.tag === 'sync-queue') {
     event.waitUntil(sendQueuedData());
@@ -28,7 +27,9 @@ self.addEventListener('sync', (event) => {
 });
 
 async function sendQueuedData() {
-  console.log(' Начинаем отправку очереди...');
+  console.log('📤 Начинаем отправку очереди...');
+  
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzd7UJQps6jw06rvI32th3I9NnCyl5UBxzlsuosvhaxviQAPR0r_xmlvG5oxTlEXZ26/exec';
   
   // Получаем очередь из IndexedDB
   const db = await openDB();
@@ -37,14 +38,12 @@ async function sendQueuedData() {
   console.log('📋 В очереди:', queue.length, 'записей');
   
   if (!queue.length) {
-    console.log('✅ Очередь пуста, ничего не отправляем');
+    console.log('✅ Очередь пуста');
     return;
   }
   
-  const API_URL = 'https://script.google.com/macros/s/AKfycbynX9Xf-tezSXdd3FfE8sT6W9bhl_d1tGytyGVtceLhkrOKppv8MO0B0DsjlwkYcVEw/exec';
-  const sentCount = 0;
+  let sentCount = 0; // ВАЖНО: let, а не const!
   
-  // Отправляем по одной записи
   for (let i = 0; i < queue.length; i++) {
     const entry = queue[i];
     try {
@@ -61,7 +60,7 @@ async function sendQueuedData() {
         console.log(`✅ Отправлено ${i + 1} из ${queue.length}`);
       } else {
         console.log('❌ Ошибка сервера:', response.status);
-        break; // Останавливаемся, остальные попробуем позже
+        break;
       }
     } catch (err) {
       console.log('❌ Ошибка сети:', err);
@@ -74,10 +73,8 @@ async function sendQueuedData() {
     const remaining = queue.slice(sentCount);
     await saveQueueToDB(db, remaining);
     console.log(`✅ Отправлено: ${sentCount}, осталось: ${remaining.length}`);
-  }
-  
-  // Уведомление пользователю
-  if (sentCount > 0) {
+    
+    // Уведомление пользователю
     self.registration.showNotification('✅ Отчёты отправлены', {
       body: `Успешно отправлено: ${sentCount} отчёт(ов)`,
       icon: './logo.png',
@@ -86,18 +83,17 @@ async function sendQueuedData() {
       tag: 'sync-complete',
       requireInteraction: false
     });
-  }
-  
-  // === СИНХРОНИЗАЦИЯ С ОСНОВНОЙ СТРАНИЦЕЙ ===
-  // Сообщаем основной странице, сколько записей отправлено
-  self.clients.matchAll().then(clients => {
-    clients.forEach(client => {
-      client.postMessage({ 
-        type: 'sync-complete', 
-        sentCount: sentCount 
+    
+    // Сообщаем основной странице
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({ 
+          type: 'sync-complete', 
+          sentCount: sentCount 
+        });
       });
     });
-  });
+  }
 }
 
 // === Вспомогательные функции для IndexedDB ===
@@ -119,7 +115,7 @@ function getQueueFromDB(db) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction('queue', 'readonly');
     const store = tx.objectStore('queue');
-    const request = store.get(QUEUE_KEY);
+    const request = store.get('queue-data');
     request.onsuccess = () => resolve(request.result || []);
     request.onerror = () => reject(request.error);
   });
@@ -129,7 +125,7 @@ function saveQueueToDB(db, queue) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction('queue', 'readwrite');
     const store = tx.objectStore('queue');
-    store.put(queue, QUEUE_KEY);
+    store.put(queue, 'queue-data');
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
@@ -168,4 +164,3 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
-
