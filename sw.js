@@ -1,5 +1,5 @@
 // === SERVICE WORKER ДЛЯ ДИСЛОКАЦИИ ВБФ v2 ===
-const CACHE_NAME = 'dislokaciya-v2';
+const CACHE_NAME = 'dislokaciya-v3';
 
 // Установка Service Worker
 self.addEventListener('install', (event) => {
