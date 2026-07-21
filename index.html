@@ -712,24 +712,46 @@
     }
 
     function setupConditionalLogic() {
-      // Бассейн -> Ориентир
-      document.getElementById('basin').addEventListener('input', function() {
-        const basin = this.value;
-        const locationKey = basinLocationsMap[basin];
-        const locationInput = document.getElementById('location');
-        
-        if (locationKey && appData[locationKey]) {
-          updateSearchableOptions('location', 'location_dropdown', appData[locationKey]);
-          locationInput.disabled = false;
-          locationInput.placeholder = 'Начните вводить...';
-        } else {
-          locationInput.value = '';
-          locationInput.disabled = true;
-          locationInput.placeholder = 'Сначала выберите бассейн';
-          document.getElementById('location_dropdown').innerHTML = '';
-          document.getElementById('location_dropdown').classList.remove('show');
-        }
-      });
+// Бассейн -> Ориентир
+document.getElementById('basin').addEventListener('input', function() {
+  const basin = this.value;
+  const locationKey = basinLocationsMap[basin];
+  const locationInput = document.getElementById('location');
+  const locationDropdown = document.getElementById('location_dropdown');
+  
+  console.log('Выбран бассейн:', basin, 'Ключ:', locationKey);
+  
+  if (locationKey && appData[locationKey] && appData[locationKey].length > 0) {
+    // Разблокируем поле
+    locationInput.disabled = false;
+    locationInput.placeholder = 'Начните вводить...';
+    
+    // Обновляем опции
+    const options = appData[locationKey];
+    
+    // Сбрасываем флаг инициализации
+    delete locationInput.dataset.searchableInit;
+    
+    // Очищаем dropdown
+    locationDropdown.innerHTML = '';
+    locationDropdown.classList.remove('show');
+    
+    // Переинициализируем поиск
+    setTimeout(() => {
+      initSearchableSelect('location', 'location_dropdown', options);
+      console.log('Ориентиры загружены:', options.length, 'штук');
+    }, 100);
+    
+  } else {
+    // Блокируем если бассейн не выбран или нет данных
+    locationInput.value = '';
+    locationInput.disabled = true;
+    locationInput.placeholder = 'Сначала выберите бассейн';
+    locationDropdown.innerHTML = '';
+    locationDropdown.classList.remove('show');
+    console.log('Нет данных для бассейна:', basin);
+  }
+});
 
       // Состояние судна -> Причина остановки
       document.getElementById('ship_condition').addEventListener('input', function() {
