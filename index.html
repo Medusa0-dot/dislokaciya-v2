@@ -536,15 +536,21 @@
     let appData = {};
     let isSelectingValue = false;
 
-const basinLocationsMap = {
-  'Волго-Балтийский бассейн': 'locations_volgo_balt',
-  'Беломоро-Онежский бассейн': 'locations_belo_onesh',
-  'Московский бассейн': 'locations_moscow',
-  'Волжский бассейн, Верхняя Волга': 'locations_upper_volga',
-  'Волжский бассейн, Нижняя Волга': 'locations_lower_volga',
-  'Камский бассейн': 'locations_kama',
-  'Волго-Донской бассейн': 'locations_volgo_don'
-};
+// Умная функция определения ключа ориентиров по названию бассейна
+function getLocationKeyForBasin(basinName) {
+  if (!basinName) return null;
+  const name = basinName.toLowerCase();
+  
+  if (name.includes('волго-балт') || name.includes('волгобалт')) return 'locations_volgo_balt';
+  if (name.includes('беломор') || name.includes('бело-онег')) return 'locations_belo_onesh';
+  if (name.includes('московск')) return 'locations_moscow';
+  if (name.includes('верхн') && name.includes('волг')) return 'locations_upper_volga';
+  if (name.includes('нижн') && name.includes('волг')) return 'locations_lower_volga';
+  if (name.includes('камск')) return 'locations_kama';
+  if (name.includes('волго-дон') || name.includes('волгодон')) return 'locations_volgo_don';
+  
+  return null;
+}
 
     // === ИНИЦИАЛИЗАЦИЯ ===
     window.addEventListener('load', async () => {
@@ -712,10 +718,10 @@ const basinLocationsMap = {
     }
 
     function setupConditionalLogic() {
-// Бассейн -> Ориентир
+// Бассейн -> Ориентир (умная проверка)
 document.getElementById('basin').addEventListener('input', function() {
   const basin = this.value;
-  const locationKey = basinLocationsMap[basin];
+  const locationKey = getLocationKeyForBasin(basin);
   const locationInput = document.getElementById('location');
   const locationDropdown = document.getElementById('location_dropdown');
   
@@ -725,25 +731,20 @@ document.getElementById('basin').addEventListener('input', function() {
     // Разблокируем поле
     locationInput.disabled = false;
     locationInput.placeholder = 'Начните вводить...';
-    
-    // Обновляем опции
-    const options = appData[locationKey];
+    locationInput.value = '';
     
     // Сбрасываем флаг инициализации
     delete locationInput.dataset.searchableInit;
-    
-    // Очищаем dropdown
     locationDropdown.innerHTML = '';
     locationDropdown.classList.remove('show');
     
     // Переинициализируем поиск
     setTimeout(() => {
-      initSearchableSelect('location', 'location_dropdown', options);
-      console.log('Ориентиры загружены:', options.length, 'штук');
+      initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
+      console.log('Ориентиры загружены:', appData[locationKey].length, 'штук');
     }, 100);
     
   } else {
-    // Блокируем если бассейн не выбран или нет данных
     locationInput.value = '';
     locationInput.disabled = true;
     locationInput.placeholder = 'Сначала выберите бассейн';
