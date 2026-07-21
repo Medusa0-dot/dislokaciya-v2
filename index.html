@@ -243,21 +243,21 @@
         <div class="card">
           <div class="card-header">📦 Груз</div>
           <div class="card-body">
-            <!-- Для самоходных -->
-            <div id="cargo_self">
-              <label>Род груза
-                <div class="searchable-select">
-                  <input type="text" id="cargo_type" name="cargo_type" placeholder="Начните вводить..." required autocomplete="off">
-                  <div class="searchable-dropdown" id="cargo_type_dropdown"></div>
-                </div>
-              </label>
-              <label>Средняя осадка, см
-                <input type="text" name="draft_cm" inputmode="decimal" placeholder="Например: 280" required>
-              </label>
-              <label>Кол-во груза, тн
-                <input type="text" name="cargo_amount" inputmode="decimal" placeholder="Например: 3000" required>
-              </label>
-            </div>
+<!-- Для самоходных -->
+<div id="cargo_self">
+  <label>Род груза
+    <div class="searchable-select">
+      <input type="text" id="cargo_type" name="cargo_type" placeholder="Начните вводить..." autocomplete="off">
+      <div class="searchable-dropdown" id="cargo_type_dropdown"></div>
+    </div>
+  </label>
+  <label>Средняя осадка, см
+    <input type="text" name="draft_cm" inputmode="decimal" placeholder="Например: 280">
+  </label>
+  <label>Кол-во груза, тн
+    <input type="text" name="cargo_amount" inputmode="decimal" placeholder="Например: 3000">
+  </label>
+</div>
 
             <!-- Для буксиров -->
 <div id="cargo_tug" class="hidden">
@@ -887,7 +887,7 @@ document.getElementById('basin').addEventListener('input', function() {
       let hasError = false;
       const form = e.target;
       
-      // 1. Проверяем стандартные обязательные поля
+      // 1. Проверяем стандартные обязательные поля (клиент, отправление, назначение, бассейн и т.д.)
       form.querySelectorAll('[required]').forEach(field => {
         if (!field.value.trim()) {
           field.classList.add('field-error');
@@ -895,7 +895,19 @@ document.getElementById('basin').addEventListener('input', function() {
         }
       });
 
-      // 2. Дополнительная проверка для буксиров (так как у них нет атрибута required в HTML)
+      // 2. Проверка для САМОХОДНЫХ судов (так как убрали required из HTML)
+      if (currentShip && currentShip.ship_type === 'self') {
+        const selfFields = ['cargo_type', 'draft_cm', 'cargo_amount'];
+        selfFields.forEach(fieldName => {
+          const field = form.querySelector(`[name="${fieldName}"]`) || document.getElementById(fieldName);
+          if (field && !field.value.trim()) {
+            field.classList.add('field-error');
+            hasError = true;
+          }
+        });
+      }
+
+      // 3. Проверка для БУКСИРОВ
       if (currentShip && currentShip.ship_type === 'tug') {
         const tugFields = ['cargo_type_bow', 'draft_cm_bow', 'cargo_amount_bow', 'cargo_type_stern', 'draft_cm_stern', 'cargo_amount_stern'];
         tugFields.forEach(fieldName => {
@@ -914,7 +926,7 @@ document.getElementById('basin').addEventListener('input', function() {
           firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
           firstError.focus();
         }
-        return;
+        return; // Останавливаем отправку
       }
 
       const fd = new FormData(form);
