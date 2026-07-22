@@ -684,8 +684,14 @@ function getLocationKeyForBasin(basinName) {
         initSearchableSelect('cargo_type', 'cargo_type_dropdown', appData.cargo_types_self || []);
       }
 
-      const basins = shipType === 'tug' ? (appData.basins_tug || []) : (appData.basins_self || []);
-      initSearchableSelect('basin', 'basin_dropdown', basins);
+  const basins = shipType === 'tug' ? (appData.basins_tug || []) : (appData.basins_self || []);
+  
+  // Для буксиров убираем Беломоро-Онежский бассейн
+  const filteredBasins = shipType === 'tug' 
+    ? basins.filter(b => !b.toLowerCase().includes('беломор') && !b.toLowerCase().includes('бело-онег'))
+    : basins;
+  
+  initSearchableSelect('basin', 'basin_dropdown', filteredBasins);
       
       initSearchableSelect('client', 'client_dropdown', appData.clients || []);
       initSearchableSelect('departure', 'departure_dropdown', appData.ports || []);
