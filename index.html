@@ -16,73 +16,307 @@
 
   <style>
     :root {
-      --bg-color: #f5f9fc;
+      --primary: #1976d2;
+      --primary-light: #e3f2fd;
+      --primary-dark: #1565c0;
+      --bg-color: #f5f7fa;
       --card-bg: #ffffff;
-      --text-color: #2c3e50;
-      --primary: #1e88c7;
-      --primary-hover: #1565c0;
-      --border: #d1d9e6;
-      --success: #27ae60;
-      --warning: #f39c12;
-      --danger: #e74c3c;
+      --text-color: #333333;
+      --text-secondary: #78909c;
+      --border: #e0e0e0;
+      --success: #4caf50;
+      --danger: #f44336;
+      --warning: #ff9800;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
+      --radius: 12px;
     }
     [data-theme="dark"] {
-      --bg-color: #1a1a2e;
-      --card-bg: #16213e;
+      --primary: #64b5f6;
+      --primary-light: #1e3a5f;
+      --primary-dark: #42a5f5;
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
       --text-color: #e0e0e0;
-      --primary: #4dabf7;
-      --primary-hover: #339af0;
-      --border: #2c3e50;
+      --text-secondary: #9e9e9e;
+      --border: #333333;
+      --shadow: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-hover: 0 4px 12px rgba(0,0,0,0.4);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: var(--bg-color); color: var(--text-color); padding: 15px; transition: background 0.3s, color 0.3s; }
     
-    .container { max-width: 600px; margin: 0 auto; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
     
-    /* Карточки */
-    .card {
+    body { 
+      background: var(--bg-color); 
+      color: var(--text-color); 
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    /* Шапка */
+    .header {
       background: var(--card-bg);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 15px 30px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .header-logo img {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .header-title h1 {
+      font-size: 1.3em;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .header-title p {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      position: relative;
+    }
+    
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--primary-light);
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 500;
+      color: var(--primary);
+    }
+    
+    .status-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    .status-badge.offline::before {
+      background: var(--danger);
+      animation: none;
+    }
+    
+    .status-badge.syncing::before {
+      background: var(--warning);
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .menu-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      font-size: 1.2em;
+      color: var(--text-color);
+    }
+    
+    .menu-btn:hover {
+      background: var(--bg-color);
+    }
+    
+    .dropdown-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: var(--shadow-hover);
+      min-width: 180px;
+      overflow: hidden;
+      display: none;
+      z-index: 1001;
       border: 1px solid var(--border);
     }
+    
+    .dropdown-menu.show {
+      display: block;
+    }
+    
+    .dropdown-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+      color: var(--text-color);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 0.95em;
+    }
+    
+    .dropdown-item:hover {
+      background: var(--bg-color);
+    }
+    
+    .dropdown-item.danger {
+      color: var(--danger);
+    }
+    
+    /* Контейнер */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    /* Карточка судна */
+    .ship-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      border: 2px solid var(--primary);
+    }
+    
+    .ship-name {
+      font-size: 1.4em;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+    
+    .captain-label {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-align: left;
+      display: block;
+      font-weight: 500;
+    }
+    
+    /* Сетка формы */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .form-grid.full-width {
+      grid-template-columns: 1fr;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 25px;
+      box-shadow: var(--shadow);
+      border-top: 3px solid var(--primary);
+    }
+    
     .card-header {
       font-size: 1.1em;
       font-weight: 600;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--primary);
       color: var(--primary);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .collapsible .card-header { cursor: pointer; user-select: none; }
-    .collapsible .card-header::after { content: '▼'; font-size: 0.8em; transition: transform 0.3s; }
-    .collapsible.closed .card-header::after { transform: rotate(-90deg); }
-    .collapsible.closed .card-body { display: none; }
-
+    
+    .collapsible .card-header {
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .collapsible .card-header::after {
+      content: '▼';
+      font-size: 0.8em;
+      transition: transform 0.3s;
+    }
+    
+    .collapsible.closed .card-header::after {
+      transform: rotate(-90deg);
+    }
+    
+    .collapsible.closed .card-body {
+      display: none;
+    }
+    
     /* Поля формы */
-    label { display: block; margin-bottom: 15px; font-weight: 500; font-size: 0.95em; }
+    label {
+      display: block;
+      margin-bottom: 18px;
+      font-weight: 500;
+      font-size: 0.9em;
+      color: var(--text-color);
+    }
+    
+    label small {
+      color: var(--text-secondary);
+      font-weight: 400;
+      font-size: 0.85em;
+    }
+    
     input, select, textarea {
       width: 100%;
-      padding: 12px;
-      margin-top: 5px;
+      padding: 12px 15px;
+      margin-top: 6px;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: var(--card-bg);
       color: var(--text-color);
-      font-size: 16px; /* Предотвращает зум на iOS */
+      font-size: 0.95em;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+    
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(30, 136, 199, 0.1);
+      box-shadow: 0 0 0 3px var(--primary-light);
     }
-    .field-error { border-color: var(--danger) !important; background: rgba(231, 76, 60, 0.05) !important; }
-
+    
+    input:disabled {
+      background: var(--bg-color);
+      color: var(--text-secondary);
+    }
+    
+    .field-error {
+      border-color: var(--danger) !important;
+      background: rgba(244, 67, 54, 0.05) !important;
+    }
+    
     /* Кнопки */
     .btn {
       width: 100%;
@@ -91,18 +325,36 @@
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 1.1em;
+      font-size: 1em;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s;
+      margin-top: 20px;
+      transition: background 0.2s, transform 0.1s;
     }
-    .btn:hover { background: var(--primary-hover); }
-    .btn-secondary { background: #95a5a6; margin-top: 10px; }
-    .btn-secondary:hover { background: #7f8c8d; }
-
+    
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary {
+      background: #78909c;
+      margin-top: 10px;
+    }
+    
+    .btn-secondary:hover {
+      background: #546e7a;
+    }
+    
     /* Поиск в выпадающем списке */
-    .searchable-select { position: relative; }
+    .searchable-select {
+      position: relative;
+    }
+    
     .searchable-dropdown {
       position: absolute;
       top: 100%;
@@ -115,34 +367,37 @@
       overflow-y: auto;
       z-index: 1000;
       display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: var(--shadow-hover);
+      margin-top: 4px;
     }
-    .searchable-dropdown.show { display: block; }
+    
+    .searchable-dropdown.show {
+      display: block;
+    }
+    
     .searchable-option {
-      padding: 12px;
+      padding: 10px 15px;
       cursor: pointer;
       border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
     }
-    .searchable-option:hover, .searchable-option.selected { background: rgba(30, 136, 199, 0.1); }
-    .searchable-no-results { padding: 12px; color: #95a5a6; text-align: center; }
-
-    /* Статус сети и очереди */
-    .status-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 8px 15px;
-      text-align: center;
-      font-size: 0.9em;
-      font-weight: 600;
-      z-index: 9999;
-      transition: transform 0.3s;
-    }
-    .status-bar.online { background: var(--success); color: white; }
-    .status-bar.offline { background: var(--danger); color: white; }
-    .status-bar.syncing { background: var(--warning); color: white; }
     
+    .searchable-option:hover,
+    .searchable-option.selected {
+      background: var(--primary-light);
+    }
+    
+    .searchable-option:last-child {
+      border-bottom: none;
+    }
+    
+    .searchable-no-results {
+      padding: 12px 15px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    
+    /* Бейдж очереди */
     .queue-badge {
       position: fixed;
       bottom: 20px;
@@ -156,19 +411,27 @@
       z-index: 9998;
       display: none;
     }
-
-    /* Утилиты */
-    .hidden { display: none !important; }
-    .text-center { text-align: center; }
-    .mt-2 { margin-top: 10px; }
     
-    /* Анимация тоста */
+    /* Утилиты */
+    .hidden {
+      display: none !important;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .mt-2 {
+      margin-top: 10px;
+    }
+    
+    /* Toast уведомления */
     .toast {
       position: fixed;
       bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
       color: white;
       padding: 12px 24px;
       border-radius: 25px;
@@ -177,15 +440,91 @@
       opacity: 0;
       transition: opacity 0.3s;
       pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .toast.show { opacity: 1; }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    /* Блоки секций (для буксира) */
+    .section-block {
+      background: var(--primary-light);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--primary);
+    }
+    
+    .section-block.stern {
+      background: rgba(76, 175, 80, 0.1);
+      border-left-color: var(--success);
+    }
+    
+    .section-block strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+    
+    .section-block.stern strong {
+      color: #2e7d32;
+    }
+    
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      .header {
+        padding: 12px 15px;
+      }
+      
+      .header-logo img {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .header-title h1 {
+        font-size: 1.1em;
+      }
+      
+      .header-title p {
+        font-size: 0.75em;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .container {
+        padding: 15px 10px;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Индикатор сети -->
-  <div id="network_status" class="status-bar online">🟢 В сети</div>
-  
+  <!-- Шапка -->
+  <header class="header">
+    <div class="header-logo">
+      <img src="logo.png" alt="Логотип">
+      <div class="header-title">
+        <h1>Волго-Балтийский Флот</h1>
+        <p>Система дислокации судов</p>
+      </div>
+    </div>
+    <div class="header-controls">
+      <div id="network_status" class="status-badge">В сети</div>
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+      <div id="dropdown_menu" class="dropdown-menu">
+        <button class="dropdown-item" onclick="toggleTheme()">Темная тема</button>
+        <button class="dropdown-item danger" onclick="logout()">Выйти</button>
+      </div>
+    </div>
+  </header>
+
   <!-- Бейдж очереди -->
   <div id="queue_badge" class="queue-badge">📋 В очереди: <span id="queue_count">0</span></div>
   
@@ -194,333 +533,385 @@
 
   <div class="container">
     <!-- ЭКРАН ВХОДА -->
-    <div id="login_screen" class="card text-center">
-      <img src="logo.png" alt="Логотип" style="width: 120px; margin-bottom: 20px;">
-      <h2 style="margin-bottom: 20px; color: var(--primary);">Дислокация ВБФ</h2>
+    <div id="login_screen" class="card text-center" style="max-width: 500px; margin: 50px auto; padding: 40px;">
+      <img src="logo.png" alt="Логотип" style="width: 100px; margin-bottom: 20px;">
+      <h2 style="margin-bottom: 10px; color: var(--primary);">Вход в систему</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 30px;">Введите PIN-код для авторизации</p>
+      
       <label style="text-align: left;">
-        Введите PIN-код (последние 4 цифры рабочего номера):
-        <input type="text" id="pin_input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Например: 4567">
+        PIN-код (последние 4 цифры рабочего номера)
+        <input type="password" id="pin_input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="****" style="letter-spacing: 5px; font-size: 1.2em; text-align: center;">
       </label>
+      
       <button class="btn" onclick="tryLogin()">Войти</button>
-      <p class="mt-2" style="font-size: 0.9em; color: #7f8c8d;">Если забыли PIN, обратитесь к диспетчеру</p>
-      <button class="btn btn-secondary" onclick="toggleTheme()" style="width: auto; padding: 8px 16px; font-size: 0.9em;">🌓 Тема</button>
+      <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: 20px;">Если забыли PIN, обратитесь к диспетчеру</p>
     </div>
 
     <!-- ОСНОВНАЯ ФОРМА -->
     <div id="main_form" class="hidden">
-      <div class="card text-center" style="padding: 10px;">
-        <span id="user_info" style="font-weight: 600; color: var(--primary);"></span>
-        <button onclick="logout()" style="float: right; background: none; border: none; color: var(--danger); cursor: pointer; font-weight: 600;">Выйти</button>
+      <!-- Карточка судна -->
+      <div class="ship-card">
+        <div class="ship-name" id="ship_name_display">—</div>
+        <label class="captain-label">Капитан</label>
+        <input type="text" id="captain_display" readonly style="background: var(--bg-color); text-align: center;">
       </div>
 
       <form id="dislocation_form">
-        <!-- Карточка 1: Основная информация -->
-        <div class="card">
-          <div class="card-header">📋 Основная информация</div>
-          <div class="card-body">
-            <label>Клиент
-              <div class="searchable-select">
-                <input type="text" id="client" name="client" placeholder="Начните вводить..." required autocomplete="off">
-                <div class="searchable-dropdown" id="client_dropdown"></div>
-              </div>
-            </label>
-            <label>Пункт отправления
-              <div class="searchable-select">
-                <input type="text" id="departure" name="departure" placeholder="Начните вводить..." required autocomplete="off">
-                <div class="searchable-dropdown" id="departure_dropdown"></div>
-              </div>
-            </label>
-            <label>Пункт назначения
-              <div class="searchable-select">
-                <input type="text" id="destination" name="destination" placeholder="Начните вводить..." required autocomplete="off">
-                <div class="searchable-dropdown" id="destination_dropdown"></div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Карточка 2: Груз (Динамическая) -->
-        <div class="card">
-          <div class="card-header">📦 Груз</div>
-          <div class="card-body">
-<!-- Для самоходных -->
-<div id="cargo_self">
-  <label>Род груза
-    <div class="searchable-select">
-      <input type="text" id="cargo_type" name="cargo_type" placeholder="Начните вводить..." autocomplete="off">
-      <div class="searchable-dropdown" id="cargo_type_dropdown"></div>
-    </div>
-  </label>
-  <label>Средняя осадка, см
-    <input type="text" name="draft_cm" inputmode="decimal" placeholder="Например: 280">
-  </label>
-  <label>Кол-во груза, тн
-    <input type="text" name="cargo_amount" inputmode="decimal" placeholder="Например: 3000">
-  </label>
-</div>
-
-            <!-- Для буксиров -->
-<div id="cargo_tug" class="hidden">
-  <div style="background: rgba(30,136,199,0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary);">
-    <strong>Носовая секция</strong>
-    <label class="mt-2">Род груза
-      <div class="searchable-select">
-        <input type="text" id="cargo_type_bow" name="cargo_type_bow" placeholder="Начните вводить..." autocomplete="off">
-        <div class="searchable-dropdown" id="cargo_type_bow_dropdown"></div>
-      </div>
-    </label>
-    <label>Средняя осадка, см
-      <input type="text" name="draft_cm_bow" inputmode="decimal" placeholder="Например: 280">
-    </label>
-    <label>Кол-во груза, тн
-      <input type="text" name="cargo_amount_bow" inputmode="decimal" placeholder="Например: 1500">
-    </label>
-  </div>
-  <div style="background: rgba(39,174,96,0.05); padding: 15px; border-radius: 8px; border-left: 4px solid var(--success);">
-    <strong>Кормовая секция</strong>
-    <label class="mt-2">Род груза
-      <div class="searchable-select">
-        <input type="text" id="cargo_type_stern" name="cargo_type_stern" placeholder="Начните вводить..." autocomplete="off">
-        <div class="searchable-dropdown" id="cargo_type_stern_dropdown"></div>
-      </div>
-    </label>
-    <label>Средняя осадка, см
-      <input type="text" name="draft_cm_stern" inputmode="decimal" placeholder="Например: 280">
-    </label>
-    <label>Кол-во груза, тн
-      <input type="text" name="cargo_amount_stern" inputmode="decimal" placeholder="Например: 1500">
-    </label>
-  </div>
-</div>
-          </div>
-        </div>
-
-        <!-- Карточка 3: Местоположение -->
-        <div class="card">
-          <div class="card-header">📍 Местоположение</div>
-          <div class="card-body">
-            <label>Бассейн
-              <div class="searchable-select">
-                <input type="text" id="basin" name="basin" placeholder="Начните вводить..." required autocomplete="off">
-                <div class="searchable-dropdown" id="basin_dropdown"></div>
-              </div>
-            </label>
-            <label id="location_label">Ориентир / Местоположение
-              <div class="searchable-select">
-                <input type="text" id="location" name="location" placeholder="Сначала выберите бассейн" disabled autocomplete="off">
-                <div class="searchable-dropdown" id="location_dropdown"></div>
-              </div>
-            </label>
-            <label>Погодные условия
-              <div class="searchable-select">
-                <input type="text" id="weather" name="weather" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="weather_dropdown"></div>
-              </div>
-            </label>
-            <label>Классификация ветра/волнения
-              <div class="searchable-select">
-                <input type="text" id="wind_classification" name="wind_classification" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="wind_classification_dropdown"></div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Карточка 4: Статус и состояние -->
-        <div class="card">
-          <div class="card-header">⚓ Статус и состояние</div>
-          <div class="card-body">
-            <label>Статус судна
-              <div class="searchable-select">
-                <input type="text" id="status" name="status" placeholder="Начните вводить..." required autocomplete="off">
-                <div class="searchable-dropdown" id="status_dropdown"></div>
-              </div>
-            </label>
-            <label>Состояние судна
-              <div class="searchable-select">
-                <input type="text" id="ship_condition" name="ship_condition" placeholder="Начните вводить..." required autocomplete="off">
-                <div class="searchable-dropdown" id="ship_condition_dropdown"></div>
-              </div>
-            </label>
-            
-            <div id="stop_cause_section" class="hidden">
-              <label>Причина остановки
+        <div class="form-grid">
+          <!-- Карточка 1: Местоположение -->
+          <div class="card">
+            <div class="card-header">📍 Местоположение</div>
+            <div class="card-body">
+              <label>Бассейн
                 <div class="searchable-select">
-                  <input type="text" id="stop_cause" name="stop_cause" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="stop_cause_dropdown"></div>
+                  <input type="text" id="basin" name="basin" placeholder="Начните вводить..." required autocomplete="off">
+                  <div class="searchable-dropdown" id="basin_dropdown"></div>
+                </div>
+              </label>
+              <label>Ориентир / Местоположение
+                <div class="searchable-select">
+                  <input type="text" id="location" name="location" placeholder="Сначала выберите бассейн" disabled autocomplete="off">
+                  <div class="searchable-dropdown" id="location_dropdown"></div>
+                </div>
+              </label>
+              <label>Погодные условия
+                <div class="searchable-select">
+                  <input type="text" id="weather" name="weather" placeholder="Начните вводить..." autocomplete="off">
+                  <div class="searchable-dropdown" id="weather_dropdown"></div>
+                </div>
+              </label>
+              <label>Классификация ветра/волнения
+                <div class="searchable-select">
+                  <input type="text" id="wind_classification" name="wind_classification" placeholder="Начните вводить..." autocomplete="off">
+                  <div class="searchable-dropdown" id="wind_classification_dropdown"></div>
                 </div>
               </label>
             </div>
+          </div>
 
-            <label>Погрузо-разгрузочные работы
-              <div class="searchable-select">
-                <input type="text" id="loading_works" name="loading_works" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="loading_works_dropdown"></div>
-              </div>
-            </label>
-
-            <div id="stop_reason_section" class="hidden">
-              <label>Причина простоя на грузовых операциях
-                <input type="text" name="stop_reason" placeholder="Опишите причину...">
+          <!-- Карточка 2: Рейс (Основная информация) -->
+          <div class="card">
+            <div class="card-header">🚢 Рейс</div>
+            <div class="card-body">
+              <label>Клиент
+                <div class="searchable-select">
+                  <input type="text" id="client" name="client" placeholder="Начните вводить..." required autocomplete="off">
+                  <div class="searchable-dropdown" id="client_dropdown"></div>
+                </div>
+              </label>
+              <label>Пункт отправления
+                <div class="searchable-select">
+                  <input type="text" id="departure" name="departure" placeholder="Начните вводить..." required autocomplete="off">
+                  <div class="searchable-dropdown" id="departure_dropdown"></div>
+                </div>
+              </label>
+              <label>Пункт назначения
+                <div class="searchable-select">
+                  <input type="text" id="destination" name="destination" placeholder="Начните вводить..." required autocomplete="off">
+                  <div class="searchable-dropdown" id="destination_dropdown"></div>
+                </div>
               </label>
             </div>
+          </div>
 
-            <label>Постановка судна
-              <div class="searchable-select">
-                <input type="text" id="ship_positioning" name="ship_positioning" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
+          <!-- Карточка 3: Топливо (остатки) -->
+          <div class="card">
+            <div class="card-header">⛽ Топливо (остатки)</div>
+            <div class="card-body">
+              <label>Остатки ДТ, тн
+                <input type="text" name="remain_dt" inputmode="decimal" placeholder="Например: 12,5">
+              </label>
+              <label>Остатки ДМ, тн
+                <input type="text" name="remain_dm" inputmode="decimal" placeholder="Например: 5,3">
+              </label>
+              <label>Остатки масла 15W40, тн
+                <input type="text" name="remain_oil_15w40" inputmode="decimal" placeholder="Например: 0,8">
+              </label>
+            </div>
+          </div>
+
+          <!-- Карточка 4: Груз -->
+          <div class="card">
+            <div class="card-header"> Груз</div>
+            <div class="card-body">
+              <!-- Для самоходных -->
+              <div id="cargo_self">
+                <label>Род груза
+                  <div class="searchable-select">
+                    <input type="text" id="cargo_type" name="cargo_type" placeholder="Начните вводить..." autocomplete="off">
+                    <div class="searchable-dropdown" id="cargo_type_dropdown"></div>
+                  </div>
+                </label>
+                <label>Средняя осадка, см
+                  <input type="text" name="draft_cm" inputmode="decimal" placeholder="Например: 280">
+                </label>
+                <label>Кол-во груза, тн
+                  <input type="text" name="cargo_amount" inputmode="decimal" placeholder="Например: 3000">
+                </label>
               </div>
-            </label>
+
+              <!-- Для буксиров -->
+              <div id="cargo_tug" class="hidden">
+                <div class="section-block">
+                  <strong>Носовая секция</strong>
+                  <label>Род груза
+                    <div class="searchable-select">
+                      <input type="text" id="cargo_type_bow" name="cargo_type_bow" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="cargo_type_bow_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Средняя осадка, см
+                    <input type="text" name="draft_cm_bow" inputmode="decimal" placeholder="Например: 280">
+                  </label>
+                  <label>Кол-во груза, тн
+                    <input type="text" name="cargo_amount_bow" inputmode="decimal" placeholder="Например: 1500">
+                  </label>
+                </div>
+                <div class="section-block stern">
+                  <strong>Кормовая секция</strong>
+                  <label>Род груза
+                    <div class="searchable-select">
+                      <input type="text" id="cargo_type_stern" name="cargo_type_stern" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="cargo_type_stern_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Средняя осадка, см
+                    <input type="text" name="draft_cm_stern" inputmode="decimal" placeholder="Например: 280">
+                  </label>
+                  <label>Кол-во груза, тн
+                    <input type="text" name="cargo_amount_stern" inputmode="decimal" placeholder="Например: 1500">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Карточка 5: Статус и состояние -->
+          <div class="card">
+            <div class="card-header">⚓ Статус и состояние</div>
+            <div class="card-body">
+              <label>Статус судна
+                <div class="searchable-select">
+                  <input type="text" id="status" name="status" placeholder="— Выберите статус —" required autocomplete="off">
+                  <div class="searchable-dropdown" id="status_dropdown"></div>
+                </div>
+              </label>
+              <label>Состояние судна
+                <div class="searchable-select">
+                  <input type="text" id="ship_condition" name="ship_condition" placeholder="— Выберите состояние —" required autocomplete="off">
+                  <div class="searchable-dropdown" id="ship_condition_dropdown"></div>
+                </div>
+              </label>
+              
+              <div id="stop_cause_section" class="hidden">
+                <label>Причина остановки
+                  <div class="searchable-select">
+                    <input type="text" id="stop_cause" name="stop_cause" placeholder="Начните вводить..." autocomplete="off">
+                    <div class="searchable-dropdown" id="stop_cause_dropdown"></div>
+                  </div>
+                </label>
+              </div>
+
+              <label>Погрузо-разгрузочные работы
+                <div class="searchable-select">
+                  <input type="text" id="loading_works" name="loading_works" placeholder="Начните вводить..." autocomplete="off">
+                  <div class="searchable-dropdown" id="loading_works_dropdown"></div>
+                </div>
+              </label>
+
+              <div id="stop_reason_section" class="hidden">
+                <label>Причина простоя на грузовых операциях
+                  <input type="text" name="stop_reason" placeholder="Опишите причину...">
+                </label>
+              </div>
+
+              <label>Постановка судна
+                <div class="searchable-select">
+                  <input type="text" id="ship_positioning" name="ship_positioning" placeholder="Начните вводить..." autocomplete="off">
+                  <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Карточка 6: Операции с ГСМ -->
+          <div class="card">
+            <div class="card-header">⛽ Операции с ГСМ</div>
+            <div class="card-body">
+              <label>Операции с ГСМ
+                <div class="searchable-select">
+                  <input type="text" id="fuel_operation" name="fuel_operation" placeholder="Начните вводить..." autocomplete="off">
+                  <div class="searchable-dropdown" id="fuel_operation_dropdown"></div>
+                </div>
+              </label>
+
+              <div id="bunkering_details" class="hidden">
+                <div class="section-block">
+                  <strong>Детали бункеровки</strong>
+                  <label>Дата бункеровки 
+                    <input type="datetime-local" name="bunkering_date">
+                  </label>
+                  <label>Поставщик ГСМ
+                    <div class="searchable-select">
+                      <input type="text" id="fuel_supplier" name="fuel_supplier" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="fuel_supplier_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Номер заявки на топливо 
+                    <input type="text" name="fuel_request_number" inputmode="numeric">
+                  </label>
+                  <label>Место бункеровки
+                    <div class="searchable-select">
+                      <input type="text" id="bunkering_place" name="bunkering_place" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="bunkering_place_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Бункеровщик
+                    <div class="searchable-select">
+                      <input type="text" id="bunkerer" name="bunkerer" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="bunkerer_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Получено ДТ, тн 
+                    <input type="text" name="fuel_received_dt" inputmode="decimal">
+                  </label>
+                  <label>Получено ДМ, тн 
+                    <input type="text" name="fuel_received_dm" inputmode="decimal">
+                  </label>
+                </div>
+              </div>
+
+              <div id="transfer_details" class="hidden">
+                <div class="section-block stern">
+                  <strong>Детали перекачки</strong>
+                  <label>Дата перекачки 
+                    <input type="datetime-local" name="transfer_date">
+                  </label>
+                  <label>Место перекачки
+                    <div class="searchable-select">
+                      <input type="text" id="transfer_place" name="transfer_place" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="transfer_place_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>ГСМ
+                    <div class="searchable-select">
+                      <input type="text" id="fuel_type" name="fuel_type" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="fuel_type_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Судно
+                    <div class="searchable-select">
+                      <input type="text" id="fuel_ship" name="fuel_ship" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="fuel_ship_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Перекачено ДТ, тн 
+                    <input type="text" name="fuel_transferred_dt" inputmode="decimal">
+                  </label>
+                  <label>Перекачено ДМ, тн 
+                    <input type="text" name="fuel_transferred_dm" inputmode="decimal">
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Карточка 5: График работ (Сворачиваемая) -->
-        <div class="card collapsible closed">
+        <!-- Карточка 7: График работ (на всю ширину) -->
+        <div class="card collapsible closed" style="margin-top: 20px;">
           <div class="card-header" onclick="this.parentElement.classList.toggle('closed')">⏱️ График работ (нажмите, чтобы раскрыть)</div>
           <div class="card-body">
-            <label>Прибытие на грузовые работы (нотис)
-              <input type="datetime-local" name="notice_arrival">
-            </label>
-            <label>Начало грузовых работ
-              <input type="datetime-local" name="loading_start">
-            </label>
-            <label>Окончание грузовых работ
-              <input type="datetime-local" name="loading_end">
-            </label>
-            <label>До прибытия на грузовые операции осталось
-              <div class="searchable-select">
-                <input type="text" id="arrival_time" name="arrival_time" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="arrival_time_dropdown"></div>
-              </div>
-            </label>
-            <label>Прохождение Городецкого шлюза
-              <input type="datetime-local" name="gorodets_lock">
-            </label>
-          </div>
-        </div>
-
-        <!-- Карточка 6: Топливо (Сворачиваемая) -->
-        <div class="card collapsible closed">
-          <div class="card-header" onclick="this.parentElement.classList.toggle('closed')">⛽ Топливо и бункеровка (нажмите, чтобы раскрыть)</div>
-          <div class="card-body">
-            <label>Остатки ДТ, тн
-              <input type="text" name="remain_dt" inputmode="decimal" placeholder="Например: 12,5">
-            </label>
-            <label>Остатки ДМ, тн
-              <input type="text" name="remain_dm" inputmode="decimal" placeholder="Например: 5,3">
-            </label>
-            <label>Остатки масла 15W40, тн
-              <input type="text" name="remain_oil_15w40" inputmode="decimal" placeholder="Например: 0,8">
-            </label>
-            
-            <label>Операции с ГСМ
-              <div class="searchable-select">
-                <input type="text" id="fuel_operation" name="fuel_operation" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="fuel_operation_dropdown"></div>
-              </div>
-            </label>
-
-            <div id="bunkering_details" class="hidden" style="background: rgba(30,136,199,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
-              <strong>Детали бункеровки</strong>
-              <label class="mt-2">Дата бункеровки <input type="datetime-local" name="bunkering_date"></label>
-              <label>Поставщик ГСМ
+            <div class="form-grid">
+              <label>Прибытие на грузовые работы (нотис)
+                <input type="datetime-local" name="notice_arrival">
+              </label>
+              <label>Начало грузовых работ
+                <input type="datetime-local" name="loading_start">
+              </label>
+              <label>Окончание грузовых работ
+                <input type="datetime-local" name="loading_end">
+              </label>
+              <label>До прибытия на грузовые операции осталось
                 <div class="searchable-select">
-                  <input type="text" id="fuel_supplier" name="fuel_supplier" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="fuel_supplier_dropdown"></div>
+                  <input type="text" id="arrival_time" name="arrival_time" placeholder="Начните вводить..." autocomplete="off">
+                  <div class="searchable-dropdown" id="arrival_time_dropdown"></div>
                 </div>
               </label>
-              <label>Номер заявки на топливо <input type="text" name="fuel_request_number" inputmode="numeric"></label>
-              <label>Место бункеровки
-                <div class="searchable-select">
-                  <input type="text" id="bunkering_place" name="bunkering_place" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="bunkering_place_dropdown"></div>
-                </div>
+              <label>Прохождение Городецкого шлюза
+                <input type="datetime-local" name="gorodets_lock">
               </label>
-              <label>Бункеровщик
-                <div class="searchable-select">
-                  <input type="text" id="bunkerer" name="bunkerer" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="bunkerer_dropdown"></div>
-                </div>
-              </label>
-              <label>Получено ДТ, тн <input type="text" name="fuel_received_dt" inputmode="decimal"></label>
-              <label>Получено ДМ, тн <input type="text" name="fuel_received_dm" inputmode="decimal"></label>
-            </div>
-
-            <div id="transfer_details" class="hidden" style="background: rgba(243,156,18,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
-              <strong>Детали перекачки</strong>
-              <label class="mt-2">Дата перекачки <input type="datetime-local" name="transfer_date"></label>
-              <label>Место перекачки
-                <div class="searchable-select">
-                  <input type="text" id="transfer_place" name="transfer_place" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="transfer_place_dropdown"></div>
-                </div>
-              </label>
-              <label>ГСМ
-                <div class="searchable-select">
-                  <input type="text" id="fuel_type" name="fuel_type" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="fuel_type_dropdown"></div>
-                </div>
-              </label>
-              <label>Судно
-                <div class="searchable-select">
-                  <input type="text" id="fuel_ship" name="fuel_ship" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="fuel_ship_dropdown"></div>
-                </div>
-              </label>
-              <label>Перекачено ДТ, тн <input type="text" name="fuel_transferred_dt" inputmode="decimal"></label>
-              <label>Перекачено ДМ, тн <input type="text" name="fuel_transferred_dm" inputmode="decimal"></label>
             </div>
           </div>
         </div>
 
-        <!-- Карточка 7: Происшествия и пробы (Сворачиваемая) -->
-        <div class="card collapsible closed">
+        <!-- Карточка 8: Происшествия и пробы (на всю ширину) -->
+        <div class="card collapsible closed" style="margin-top: 20px;">
           <div class="card-header" onclick="this.parentElement.classList.toggle('closed')">⚠️ Происшествия и пробы (нажмите, чтобы раскрыть)</div>
           <div class="card-body">
-            <label>Вид транспортного происшествия
-              <div class="searchable-select">
-                <input type="text" id="accident_type" name="accident_type" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="accident_type_dropdown"></div>
+            <div class="form-grid">
+              <div>
+                <label>Вид транспортного происшествия
+                  <div class="searchable-select">
+                    <input type="text" id="accident_type" name="accident_type" placeholder="Начните вводить..." autocomplete="off">
+                    <div class="searchable-dropdown" id="accident_type_dropdown"></div>
+                  </div>
+                </label>
+                <div id="accident_details" class="hidden">
+                  <label>С кем произошло 
+                    <input type="text" name="accident_with" placeholder="Название судна/объекта">
+                  </label>
+                  <label>Местоположение происшествия 
+                    <input type="text" name="accident_location" placeholder="Где произошло">
+                  </label>
+                </div>
+                
+                <label>Описание ремонтных работ
+                  <textarea name="repair_description" rows="3" placeholder="Опишите ремонт..."></textarea>
+                </label>
               </div>
-            </label>
-            <div id="accident_details" class="hidden">
-              <label>С кем произошло <input type="text" name="accident_with" placeholder="Название судна/объекта"></label>
-              <label>Местоположение происшествия <input type="text" name="accident_location" placeholder="Где произошло"></label>
+              
+              <div>
+                <label>Проверка видеонаблюдения
+                  <div class="searchable-select">
+                    <input type="text" id="video_check" name="video_check" placeholder="Начните вводить..." autocomplete="off">
+                    <div class="searchable-dropdown" id="video_check_dropdown"></div>
+                  </div>
+                </label>
+
+                <label>Проба
+                  <div class="searchable-select">
+                    <input type="text" id="sample" name="sample" placeholder="Начните вводить..." autocomplete="off">
+                    <div class="searchable-dropdown" id="sample_dropdown"></div>
+                  </div>
+                </label>
+
+                <div id="sample_details" class="hidden">
+                  <div class="section-block stern">
+                    <strong>Детали пробы</strong>
+                    <label>Дата передачи пробы 
+                      <input type="datetime-local" name="sample_date">
+                    </label>
+                    <label>Номер пробы 
+                      <input type="text" name="sample_number" inputmode="numeric">
+                    </label>
+                    <label>ФИО сдавшего от судна 
+                      <input type="text" name="sample_given_by">
+                    </label>
+                    <label>ФИО принявшего от компании 
+                      <input type="text" name="sample_received_by">
+                    </label>
+                  </div>
+                </div>
+
+                <label>Горящие вопросы
+                  <textarea name="burning_questions" rows="2" placeholder="Есть ли вопросы?"></textarea>
+                </label>
+              </div>
             </div>
-            
-            <label>Описание ремонтных работ
-              <textarea name="repair_description" rows="3" placeholder="Опишите ремонт..."></textarea>
-            </label>
-
-            <label>Проверка видеонаблюдения
-              <div class="searchable-select">
-                <input type="text" id="video_check" name="video_check" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="video_check_dropdown"></div>
-              </div>
-            </label>
-
-            <label>Проба
-              <div class="searchable-select">
-                <input type="text" id="sample" name="sample" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="sample_dropdown"></div>
-              </div>
-            </label>
-
-            <div id="sample_details" class="hidden" style="background: rgba(39,174,96,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
-              <strong>Детали пробы</strong>
-              <label class="mt-2">Дата передачи пробы <input type="datetime-local" name="sample_date"></label>
-              <label>Номер пробы <input type="text" name="sample_number" inputmode="numeric"></label>
-              <label>ФИО сдавшего от судна <input type="text" name="sample_given_by"></label>
-              <label>ФИО принявшего от компании <input type="text" name="sample_received_by"></label>
-            </div>
-
-            <label class="mt-2">Горящие вопросы
-              <textarea name="burning_questions" rows="2" placeholder="Есть ли вопросы?"></textarea>
-            </label>
           </div>
         </div>
 
-        <button type="submit" class="btn">🚀 ОТПРАВИТЬ</button>
+        <button type="submit" class="btn" style="max-width: 600px; margin: 30px auto; display: block;">🚀 ОТПРАВИТЬ</button>
       </form>
     </div>
   </div>
@@ -536,21 +927,21 @@
     let appData = {};
     let isSelectingValue = false;
 
-// Умная функция определения ключа ориентиров по названию бассейна
-function getLocationKeyForBasin(basinName) {
-  if (!basinName) return null;
-  const name = basinName.toLowerCase();
-  
-  if (name.includes('волго-балт') || name.includes('волгобалт')) return 'locations_volgo_balt';
-  if (name.includes('беломор') || name.includes('бело-онег')) return 'locations_belo_onesh';
-  if (name.includes('московск')) return 'locations_moscow';
-  if (name.includes('верхн') && name.includes('волг')) return 'locations_upper_volga';
-  if (name.includes('нижн') && name.includes('волг')) return 'locations_lower_volga';
-  if (name.includes('камск')) return 'locations_kama';
-  if (name.includes('волго-дон') || name.includes('волгодон')) return 'locations_volgo_don';
-  
-  return null;
-}
+    // Умная функция определения ключа ориентиров по названию бассейна
+    function getLocationKeyForBasin(basinName) {
+      if (!basinName) return null;
+      const name = basinName.toLowerCase();
+      
+      if (name.includes('волго-балт') || name.includes('волгобалт')) return 'locations_volgo_balt';
+      if (name.includes('беломор') || name.includes('бело-онег')) return 'locations_belo_onesh';
+      if (name.includes('московск')) return 'locations_moscow';
+      if (name.includes('верхн') && name.includes('волг')) return 'locations_upper_volga';
+      if (name.includes('нижн') && name.includes('волг')) return 'locations_lower_volga';
+      if (name.includes('камск')) return 'locations_kama';
+      if (name.includes('волго-дон') || name.includes('волгодон')) return 'locations_volgo_don';
+      
+      return null;
+    }
 
     // === ИНИЦИАЛИЗАЦИЯ ===
     window.addEventListener('load', async () => {
@@ -624,7 +1015,7 @@ function getLocationKeyForBasin(basinName) {
         toast('✅ Справочники обновлены');
       } catch (err) {
         console.error('Ошибка загрузки:', err);
-        toast('⚠️ Работа в офлайн-режиме');
+        toast('️ Работа в офлайн-режиме');
       }
     }
 
@@ -651,12 +1042,13 @@ function getLocationKeyForBasin(basinName) {
         localStorage.setItem(PIN_STORAGE_KEY, pin);
         document.getElementById('login_screen').classList.add('hidden');
         document.getElementById('main_form').classList.remove('hidden');
-        document.getElementById('user_info').textContent = `${found.ship} | ${found.captains[0] || 'Капитан'}`;
+        document.getElementById('ship_name_display').textContent = found.ship;
+        document.getElementById('captain_display').value = found.captains[0] || 'Капитан';
         
         setupFormForShip(found.ship_type || 'self');
         toast(`✅ Добро пожаловать, ${found.ship}`);
       } else {
-        toast('❌ Неверный PIN-код');
+        toast(' Неверный PIN-код');
       }
     }
 
@@ -667,102 +1059,110 @@ function getLocationKeyForBasin(basinName) {
       document.getElementById('login_screen').classList.remove('hidden');
       document.getElementById('pin_input').value = '';
       document.getElementById('dislocation_form').reset();
+      document.getElementById('dropdown_menu').classList.remove('show');
     }
+
+    // === МЕНЮ ===
+    function toggleMenu() {
+      document.getElementById('dropdown_menu').classList.toggle('show');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.header-controls')) {
+        document.getElementById('dropdown_menu').classList.remove('show');
+      }
+    });
 
     // === НАСТРОЙКА ФОРМЫ ===
     function setupFormForShip(shipType) {
-  if (shipType === 'tug') {
-    document.getElementById('cargo_self').classList.add('hidden');
-    document.getElementById('cargo_tug').classList.remove('hidden');
-    
-    initSearchableSelect('cargo_type_bow', 'cargo_type_bow_dropdown', appData.cargo_types_tug || []);
-    initSearchableSelect('cargo_type_stern', 'cargo_type_stern_dropdown', appData.cargo_types_tug || []);
-  } else {
-    document.getElementById('cargo_self').classList.remove('hidden');
-    document.getElementById('cargo_tug').classList.add('hidden');
-    
-    initSearchableSelect('cargo_type', 'cargo_type_dropdown', appData.cargo_types_self || []);
-  }
+      if (shipType === 'tug') {
+        document.getElementById('cargo_self').classList.add('hidden');
+        document.getElementById('cargo_tug').classList.remove('hidden');
+        
+        initSearchableSelect('cargo_type_bow', 'cargo_type_bow_dropdown', appData.cargo_types_tug || []);
+        initSearchableSelect('cargo_type_stern', 'cargo_type_stern_dropdown', appData.cargo_types_tug || []);
+      } else {
+        document.getElementById('cargo_self').classList.remove('hidden');
+        document.getElementById('cargo_tug').classList.add('hidden');
+        
+        initSearchableSelect('cargo_type', 'cargo_type_dropdown', appData.cargo_types_self || []);
+      }
 
-  // Получаем бассейны
-  let basins = shipType === 'tug' ? (appData.basins_tug || []) : (appData.basins_self || []);
-  
-  // Для буксиров скрываем Беломоро-Онежский (но оставляем в справочнике)
-  if (shipType === 'tug') {
-    basins = basins.filter(b => {
-      const name = b.toLowerCase();
-      return !name.includes('беломор') && !name.includes('бело-онег');
-    });
-  }
-  
-  initSearchableSelect('basin', 'basin_dropdown', basins);
-  
-  initSearchableSelect('client', 'client_dropdown', appData.clients || []);
-  initSearchableSelect('departure', 'departure_dropdown', appData.ports || []);
-  initSearchableSelect('destination', 'destination_dropdown', appData.ports || []);
-  
-  initSearchableSelect('status', 'status_dropdown', appData.statuses || []);
-  initSearchableSelect('ship_condition', 'ship_condition_dropdown', appData.ship_conditions || []);
-  initSearchableSelect('loading_works', 'loading_works_dropdown', appData.loading_works || []);
-  initSearchableSelect('ship_positioning', 'ship_positioning_dropdown', appData.ship_positioning || []);
-  initSearchableSelect('weather', 'weather_dropdown', appData.weather || []);
-  initSearchableSelect('wind_classification', 'wind_classification_dropdown', appData.wind || []);
-  initSearchableSelect('stop_cause', 'stop_cause_dropdown', appData.stop_reasons || []);
-  
-  initSearchableSelect('fuel_operation', 'fuel_operation_dropdown', appData.fuel_operations || []);
-  initSearchableSelect('fuel_supplier', 'fuel_supplier_dropdown', appData.fuel_suppliers || []);
-  initSearchableSelect('bunkerer', 'bunkerer_dropdown', appData.bunkerers || []);
-  initSearchableSelect('fuel_ship', 'fuel_ship_dropdown', appData.fuel_ships || []);
-  initSearchableSelect('fuel_type', 'fuel_type_dropdown', appData.fuel_types || []);
-  
-  const bunkeringPlaces = shipType === 'tug' ? (appData.bunkering_places_tug || []) : (appData.bunkering_places_self || []);
-  initSearchableSelect('bunkering_place', 'bunkering_place_dropdown', bunkeringPlaces);
-  initSearchableSelect('transfer_place', 'transfer_place_dropdown', appData.transfer_places || []);
-  
-  initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
-  initSearchableSelect('arrival_time', 'arrival_time_dropdown', appData.arrival_time || []);
-  initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
-  initSearchableSelect('sample', 'sample_dropdown', appData.sample || []);
+      // Получаем бассейны
+      let basins = shipType === 'tug' ? (appData.basins_tug || []) : (appData.basins_self || []);
+      
+      // Для буксиров скрываем Беломоро-Онежский
+      if (shipType === 'tug') {
+        basins = basins.filter(b => {
+          const name = b.toLowerCase();
+          return !name.includes('беломор') && !name.includes('бело-онег');
+        });
+      }
+      
+      initSearchableSelect('basin', 'basin_dropdown', basins);
+      
+      initSearchableSelect('client', 'client_dropdown', appData.clients || []);
+      initSearchableSelect('departure', 'departure_dropdown', appData.ports || []);
+      initSearchableSelect('destination', 'destination_dropdown', appData.ports || []);
+      
+      initSearchableSelect('status', 'status_dropdown', appData.statuses || []);
+      initSearchableSelect('ship_condition', 'ship_condition_dropdown', appData.ship_conditions || []);
+      initSearchableSelect('loading_works', 'loading_works_dropdown', appData.loading_works || []);
+      initSearchableSelect('ship_positioning', 'ship_positioning_dropdown', appData.ship_positioning || []);
+      initSearchableSelect('weather', 'weather_dropdown', appData.weather || []);
+      initSearchableSelect('wind_classification', 'wind_classification_dropdown', appData.wind || []);
+      initSearchableSelect('stop_cause', 'stop_cause_dropdown', appData.stop_reasons || []);
+      
+      initSearchableSelect('fuel_operation', 'fuel_operation_dropdown', appData.fuel_operations || []);
+      initSearchableSelect('fuel_supplier', 'fuel_supplier_dropdown', appData.fuel_suppliers || []);
+      initSearchableSelect('bunkerer', 'bunkerer_dropdown', appData.bunkerers || []);
+      initSearchableSelect('fuel_ship', 'fuel_ship_dropdown', appData.fuel_ships || []);
+      initSearchableSelect('fuel_type', 'fuel_type_dropdown', appData.fuel_types || []);
+      
+      const bunkeringPlaces = shipType === 'tug' ? (appData.bunkering_places_tug || []) : (appData.bunkering_places_self || []);
+      initSearchableSelect('bunkering_place', 'bunkering_place_dropdown', bunkeringPlaces);
+      initSearchableSelect('transfer_place', 'transfer_place_dropdown', appData.transfer_places || []);
+      
+      initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
+      initSearchableSelect('arrival_time', 'arrival_time_dropdown', appData.arrival_time || []);
+      initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
+      initSearchableSelect('sample', 'sample_dropdown', appData.sample || []);
 
-  setupConditionalLogic();
-}
+      setupConditionalLogic();
+    }
 
     function setupConditionalLogic() {
-// Бассейн -> Ориентир (умная проверка)
-document.getElementById('basin').addEventListener('input', function() {
-  const basin = this.value;
-  const locationKey = getLocationKeyForBasin(basin);
-  const locationInput = document.getElementById('location');
-  const locationDropdown = document.getElementById('location_dropdown');
-  
-  console.log('Выбран бассейн:', basin, 'Ключ:', locationKey);
-  
-  if (locationKey && appData[locationKey] && appData[locationKey].length > 0) {
-    // Разблокируем поле
-    locationInput.disabled = false;
-    locationInput.placeholder = 'Начните вводить...';
-    locationInput.value = '';
-    
-    // Сбрасываем флаг инициализации
-    delete locationInput.dataset.searchableInit;
-    locationDropdown.innerHTML = '';
-    locationDropdown.classList.remove('show');
-    
-    // Переинициализируем поиск
-    setTimeout(() => {
-      initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
-      console.log('Ориентиры загружены:', appData[locationKey].length, 'штук');
-    }, 100);
-    
-  } else {
-    locationInput.value = '';
-    locationInput.disabled = true;
-    locationInput.placeholder = 'Сначала выберите бассейн';
-    locationDropdown.innerHTML = '';
-    locationDropdown.classList.remove('show');
-    console.log('Нет данных для бассейна:', basin);
-  }
-});
+      // Бассейн -> Ориентир
+      document.getElementById('basin').addEventListener('input', function() {
+        const basin = this.value;
+        const locationKey = getLocationKeyForBasin(basin);
+        const locationInput = document.getElementById('location');
+        const locationDropdown = document.getElementById('location_dropdown');
+        
+        console.log('Выбран бассейн:', basin, 'Ключ:', locationKey);
+        
+        if (locationKey && appData[locationKey] && appData[locationKey].length > 0) {
+          locationInput.disabled = false;
+          locationInput.placeholder = 'Начните вводить...';
+          locationInput.value = '';
+          
+          delete locationInput.dataset.searchableInit;
+          locationDropdown.innerHTML = '';
+          locationDropdown.classList.remove('show');
+          
+          setTimeout(() => {
+            initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
+            console.log('Ориентиры загружены:', appData[locationKey].length, 'штук');
+          }, 100);
+          
+        } else {
+          locationInput.value = '';
+          locationInput.disabled = true;
+          locationInput.placeholder = 'Сначала выберите бассейн';
+          locationDropdown.innerHTML = '';
+          locationDropdown.classList.remove('show');
+        }
+      });
 
       // Состояние судна -> Причина остановки
       document.getElementById('ship_condition').addEventListener('input', function() {
@@ -832,26 +1232,6 @@ document.getElementById('basin').addEventListener('input', function() {
       }
     }
 
-    function updateSearchableOptions(inputId, dropdownId, newOptions) {
-      const input = document.getElementById(inputId);
-      const dropdown = document.getElementById(dropdownId);
-      if (!input || !dropdown) return;
-      
-      const currentValue = input.value;
-      delete input.dataset.searchableInit;
-      
-      const newInput = input.cloneNode(true);
-      input.parentNode.replaceChild(newInput, input);
-      
-      initSearchableSelect(inputId, dropdownId, newOptions);
-      
-      if (newOptions.includes(currentValue)) {
-        newInput.value = currentValue;
-      } else {
-        newInput.value = '';
-      }
-    }
-
     function updateDropdown(query, options, dropdown, input) {
       if (isSelectingValue) return;
       dropdown.innerHTML = '';
@@ -888,7 +1268,6 @@ document.getElementById('basin').addEventListener('input', function() {
       dropdown.classList.add('show');
     }
 
-    // === ОТПРАВКА ФОРМЫ ===
     // === ОТПРАВКА ФОРМЫ ===
     document.getElementById('dislocation_form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -964,7 +1343,6 @@ document.getElementById('basin').addEventListener('input', function() {
         data.cargo_type = fd.get('cargo_type'); data.draft_cm = fd.get('draft_cm'); data.cargo_amount = fd.get('cargo_amount');
       }
 
-      // === ГЛАВНОЕ ИСПРАВЛЕНИЕ: Разделение логики для Online и Offline ===
       if (navigator.onLine) {
         toast('📤 Отправка...');
         try {
@@ -981,7 +1359,6 @@ document.getElementById('basin').addEventListener('input', function() {
           }
         } catch (err) {
           toast('❌ Ошибка сети. Сохранено в очередь.');
-          // Fallback: если прямая отправка не удалась, кладем в очередь
           const q = loadQueue();
           q.push(data);
           saveQueue(q);
@@ -989,7 +1366,6 @@ document.getElementById('basin').addEventListener('input', function() {
           renderQueue();
         }
       } else {
-        // ОФЛАЙН: просто кладем в очередь
         const q = loadQueue();
         q.push(data);
         saveQueue(q);
@@ -1073,14 +1449,14 @@ document.getElementById('basin').addEventListener('input', function() {
     function updateNetworkStatus(state) {
       const el = document.getElementById('network_status');
       if (state === 'syncing') {
-        el.className = 'status-bar syncing';
-        el.textContent = '🔄 Синхронизация...';
+        el.className = 'status-badge syncing';
+        el.textContent = 'Синхронизация...';
       } else if (navigator.onLine) {
-        el.className = 'status-bar online';
-        el.textContent = '🟢 В сети';
+        el.className = 'status-badge';
+        el.textContent = 'В сети';
       } else {
-        el.className = 'status-bar offline';
-        el.textContent = '🔴 Нет сети (данные в очереди)';
+        el.className = 'status-badge offline';
+        el.textContent = 'Нет сети';
       }
     }
 
@@ -1105,6 +1481,7 @@ document.getElementById('basin').addEventListener('input', function() {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
       localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      document.getElementById('dropdown_menu').classList.remove('show');
     }
 
     function loadTheme() {
