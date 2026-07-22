@@ -889,6 +889,7 @@ document.getElementById('basin').addEventListener('input', function() {
     }
 
     // === ОТПРАВКА ФОРМЫ ===
+    // === ОТПРАВКА ФОРМЫ ===
     document.getElementById('dislocation_form').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentShip) { toast('❌ Сначала войдите по PIN'); return; }
@@ -897,7 +898,6 @@ document.getElementById('basin').addEventListener('input', function() {
       let hasError = false;
       const form = e.target;
       
-      // 1. Проверяем стандартные обязательные поля (клиент, отправление, назначение, бассейн и т.д.)
       form.querySelectorAll('[required]').forEach(field => {
         if (!field.value.trim()) {
           field.classList.add('field-error');
@@ -905,38 +905,25 @@ document.getElementById('basin').addEventListener('input', function() {
         }
       });
 
-      // 2. Проверка для САМОХОДНЫХ судов (так как убрали required из HTML)
-      if (currentShip && currentShip.ship_type === 'self') {
-        const selfFields = ['cargo_type', 'draft_cm', 'cargo_amount'];
-        selfFields.forEach(fieldName => {
+      if (currentShip.ship_type === 'self') {
+        ['cargo_type', 'draft_cm', 'cargo_amount'].forEach(fieldName => {
           const field = form.querySelector(`[name="${fieldName}"]`) || document.getElementById(fieldName);
-          if (field && !field.value.trim()) {
-            field.classList.add('field-error');
-            hasError = true;
-          }
+          if (field && !field.value.trim()) { field.classList.add('field-error'); hasError = true; }
         });
       }
 
-      // 3. Проверка для БУКСИРОВ
-      if (currentShip && currentShip.ship_type === 'tug') {
-        const tugFields = ['cargo_type_bow', 'draft_cm_bow', 'cargo_amount_bow', 'cargo_type_stern', 'draft_cm_stern', 'cargo_amount_stern'];
-        tugFields.forEach(fieldName => {
+      if (currentShip.ship_type === 'tug') {
+        ['cargo_type_bow', 'draft_cm_bow', 'cargo_amount_bow', 'cargo_type_stern', 'draft_cm_stern', 'cargo_amount_stern'].forEach(fieldName => {
           const field = form.querySelector(`[name="${fieldName}"]`) || document.getElementById(fieldName);
-          if (field && !field.value.trim()) {
-            field.classList.add('field-error');
-            hasError = true;
-          }
+          if (field && !field.value.trim()) { field.classList.add('field-error'); hasError = true; }
         });
       }
       
       if (hasError) {
         toast('❌ Заполните обязательные поля (подсвечены красным)');
         const firstError = document.querySelector('.field-error');
-        if (firstError) {
-          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          firstError.focus();
-        }
-        return; // Останавливаем отправку
+        if (firstError) { firstError.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstError.focus(); }
+        return;
       }
 
       const fd = new FormData(form);
@@ -946,90 +933,76 @@ document.getElementById('basin').addEventListener('input', function() {
         ship_type: currentShip.ship_type || 'self',
         ship_name: currentShip.ship,
         captain: currentShip.captains[0] || '',
-        client: fd.get('client'),
-        departure: fd.get('departure'),
-        destination: fd.get('destination'),
-        basin: fd.get('basin'),
-        location: fd.get('location'),
-        weather: fd.get('weather'),
-        wind_classification: fd.get('wind_classification'),
-        status: fd.get('status'),
-        ship_condition: fd.get('ship_condition'),
-        loading_works: fd.get('loading_works'),
-        ship_positioning: fd.get('ship_positioning'),
-        stop_reason: fd.get('stop_reason'),
-        stop_cause: fd.get('stop_cause'),
-        notice_arrival: fd.get('notice_arrival'),
-        loading_start: fd.get('loading_start'),
-        loading_end: fd.get('loading_end'),
-        arrival_time: fd.get('arrival_time'),
-        gorodets_lock: fd.get('gorodets_lock'),
-        remain_dt: fd.get('remain_dt'),
-        remain_dm: fd.get('remain_dm'),
-        remain_oil_15w40: fd.get('remain_oil_15w40'),
-        fuel_operation: fd.get('fuel_operation'),
-        bunkering_date: fd.get('bunkering_date'),
-        fuel_supplier: fd.get('fuel_supplier'),
-        fuel_request_number: fd.get('fuel_request_number'),
-        bunkering_place: fd.get('bunkering_place'),
-        bunkerer: fd.get('bunkerer'),
-        fuel_received_dt: fd.get('fuel_received_dt'),
-        fuel_received_dm: fd.get('fuel_received_dm'),
-        transfer_date: fd.get('transfer_date'),
-        transfer_place: fd.get('transfer_place'),
-        fuel_type: fd.get('fuel_type'),
-        fuel_ship: fd.get('fuel_ship'),
-        fuel_transferred_dt: fd.get('fuel_transferred_dt'),
-        fuel_transferred_dm: fd.get('fuel_transferred_dm'),
-        accident_type: fd.get('accident_type'),
-        accident_with: fd.get('accident_with'),
-        accident_location: fd.get('accident_location'),
-        repair_description: fd.get('repair_description'),
-        video_check: fd.get('video_check'),
-        sample: fd.get('sample'),
-        sample_date: fd.get('sample_date'),
-        sample_number: fd.get('sample_number'),
-        sample_given_by: fd.get('sample_given_by'),
-        sample_received_by: fd.get('sample_received_by'),
-        burning_questions: fd.get('burning_questions')
+        client: fd.get('client'), departure: fd.get('departure'), destination: fd.get('destination'),
+        basin: fd.get('basin'), location: fd.get('location'), weather: fd.get('weather'),
+        wind_classification: fd.get('wind_classification'), status: fd.get('status'),
+        ship_condition: fd.get('ship_condition'), loading_works: fd.get('loading_works'),
+        ship_positioning: fd.get('ship_positioning'), stop_reason: fd.get('stop_reason'),
+        stop_cause: fd.get('stop_cause'), notice_arrival: fd.get('notice_arrival'),
+        loading_start: fd.get('loading_start'), loading_end: fd.get('loading_end'),
+        arrival_time: fd.get('arrival_time'), gorodets_lock: fd.get('gorodets_lock'),
+        remain_dt: fd.get('remain_dt'), remain_dm: fd.get('remain_dm'), remain_oil_15w40: fd.get('remain_oil_15w40'),
+        fuel_operation: fd.get('fuel_operation'), bunkering_date: fd.get('bunkering_date'),
+        fuel_supplier: fd.get('fuel_supplier'), fuel_request_number: fd.get('fuel_request_number'),
+        bunkering_place: fd.get('bunkering_place'), bunkerer: fd.get('bunkerer'),
+        fuel_received_dt: fd.get('fuel_received_dt'), fuel_received_dm: fd.get('fuel_received_dm'),
+        transfer_date: fd.get('transfer_date'), transfer_place: fd.get('transfer_place'),
+        fuel_type: fd.get('fuel_type'), fuel_ship: fd.get('fuel_ship'),
+        fuel_transferred_dt: fd.get('fuel_transferred_dt'), fuel_transferred_dm: fd.get('fuel_transferred_dm'),
+        accident_type: fd.get('accident_type'), accident_with: fd.get('accident_with'),
+        accident_location: fd.get('accident_location'), repair_description: fd.get('repair_description'),
+        video_check: fd.get('video_check'), sample: fd.get('sample'), sample_date: fd.get('sample_date'),
+        sample_number: fd.get('sample_number'), sample_given_by: fd.get('sample_given_by'),
+        sample_received_by: fd.get('sample_received_by'), burning_questions: fd.get('burning_questions')
       };
 
       if (data.ship_type === 'tug') {
-        data.cargo_type_bow = fd.get('cargo_type_bow');
-        data.cargo_type_stern = fd.get('cargo_type_stern');
-        data.draft_cm_bow = fd.get('draft_cm_bow');
-        data.draft_cm_stern = fd.get('draft_cm_stern');
-        data.cargo_amount_bow = fd.get('cargo_amount_bow');
-        data.cargo_amount_stern = fd.get('cargo_amount_stern');
+        data.cargo_type_bow = fd.get('cargo_type_bow'); data.cargo_type_stern = fd.get('cargo_type_stern');
+        data.draft_cm_bow = fd.get('draft_cm_bow'); data.draft_cm_stern = fd.get('draft_cm_stern');
+        data.cargo_amount_bow = fd.get('cargo_amount_bow'); data.cargo_amount_stern = fd.get('cargo_amount_stern');
       } else {
-        data.cargo_type = fd.get('cargo_type');
-        data.draft_cm = fd.get('draft_cm');
-        data.cargo_amount = fd.get('cargo_amount');
+        data.cargo_type = fd.get('cargo_type'); data.draft_cm = fd.get('draft_cm'); data.cargo_amount = fd.get('cargo_amount');
       }
 
-      const q = loadQueue();
-      q.push(data);
-      saveQueue(q);
-      
-      // IndexedDB для Background Sync
-      await saveQueueToIndexedDB(q);
-      
-      if ('serviceWorker' in navigator && 'SyncManager' in window) {
-        try {
-          const registration = await navigator.serviceWorker.ready;
-          await registration.sync.register('sync-queue');
-        } catch (err) { console.log('Sync error:', err); }
-      }
-
-      form.reset();
-      setupFormForShip(data.ship_type); // Сброс условных полей
-      renderQueue();
-
+      // === ГЛАВНОЕ ИСПРАВЛЕНИЕ: Разделение логики для Online и Offline ===
       if (navigator.onLine) {
         toast('📤 Отправка...');
-        syncQueue();
+        try {
+          const formData = new FormData();
+          formData.append('data', JSON.stringify(data));
+          
+          const response = await fetch(API_URL, { method: 'POST', body: formData });
+          if (response.ok) {
+            toast('✅ Успешно отправлено');
+            form.reset();
+            setupFormForShip(data.ship_type);
+          } else {
+            throw new Error('Server error');
+          }
+        } catch (err) {
+          toast('❌ Ошибка сети. Сохранено в очередь.');
+          // Fallback: если прямая отправка не удалась, кладем в очередь
+          const q = loadQueue();
+          q.push(data);
+          saveQueue(q);
+          await saveQueueToIndexedDB(q);
+          renderQueue();
+        }
       } else {
+        // ОФЛАЙН: просто кладем в очередь
+        const q = loadQueue();
+        q.push(data);
+        saveQueue(q);
+        await saveQueueToIndexedDB(q);
+        renderQueue();
         toast('💾 Сохранено в очередь (нет сети)');
+        
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+          try {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.sync.register('sync-queue');
+          } catch (err) { console.log('Sync error:', err); }
+        }
       }
     });
 
