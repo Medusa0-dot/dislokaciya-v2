@@ -671,57 +671,61 @@ function getLocationKeyForBasin(basinName) {
 
     // === НАСТРОЙКА ФОРМЫ ===
     function setupFormForShip(shipType) {
-      if (shipType === 'tug') {
-        document.getElementById('cargo_self').classList.add('hidden');
-        document.getElementById('cargo_tug').classList.remove('hidden');
-        
-        initSearchableSelect('cargo_type_bow', 'cargo_type_bow_dropdown', appData.cargo_types_tug || []);
-        initSearchableSelect('cargo_type_stern', 'cargo_type_stern_dropdown', appData.cargo_types_tug || []);
-      } else {
-        document.getElementById('cargo_self').classList.remove('hidden');
-        document.getElementById('cargo_tug').classList.add('hidden');
-        
-        initSearchableSelect('cargo_type', 'cargo_type_dropdown', appData.cargo_types_self || []);
-      }
+  if (shipType === 'tug') {
+    document.getElementById('cargo_self').classList.add('hidden');
+    document.getElementById('cargo_tug').classList.remove('hidden');
+    
+    initSearchableSelect('cargo_type_bow', 'cargo_type_bow_dropdown', appData.cargo_types_tug || []);
+    initSearchableSelect('cargo_type_stern', 'cargo_type_stern_dropdown', appData.cargo_types_tug || []);
+  } else {
+    document.getElementById('cargo_self').classList.remove('hidden');
+    document.getElementById('cargo_tug').classList.add('hidden');
+    
+    initSearchableSelect('cargo_type', 'cargo_type_dropdown', appData.cargo_types_self || []);
+  }
 
-  const basins = shipType === 'tug' ? (appData.basins_tug || []) : (appData.basins_self || []);
+  // Получаем бассейны
+  let basins = shipType === 'tug' ? (appData.basins_tug || []) : (appData.basins_self || []);
   
-  // Для буксиров убираем Беломоро-Онежский бассейн
-  const filteredBasins = shipType === 'tug' 
-    ? basins.filter(b => !b.toLowerCase().includes('беломор') && !b.toLowerCase().includes('бело-онег'))
-    : basins;
+  // Для буксиров скрываем Беломоро-Онежский (но оставляем в справочнике)
+  if (shipType === 'tug') {
+    basins = basins.filter(b => {
+      const name = b.toLowerCase();
+      return !name.includes('беломор') && !name.includes('бело-онег');
+    });
+  }
   
-  initSearchableSelect('basin', 'basin_dropdown', filteredBasins);
-      
-      initSearchableSelect('client', 'client_dropdown', appData.clients || []);
-      initSearchableSelect('departure', 'departure_dropdown', appData.ports || []);
-      initSearchableSelect('destination', 'destination_dropdown', appData.ports || []);
-      
-      initSearchableSelect('status', 'status_dropdown', appData.statuses || []);
-      initSearchableSelect('ship_condition', 'ship_condition_dropdown', appData.ship_conditions || []);
-      initSearchableSelect('loading_works', 'loading_works_dropdown', appData.loading_works || []);
-      initSearchableSelect('ship_positioning', 'ship_positioning_dropdown', appData.ship_positioning || []);
-      initSearchableSelect('weather', 'weather_dropdown', appData.weather || []);
-      initSearchableSelect('wind_classification', 'wind_classification_dropdown', appData.wind || []);
-      initSearchableSelect('stop_cause', 'stop_cause_dropdown', appData.stop_reasons || []);
-      
-      initSearchableSelect('fuel_operation', 'fuel_operation_dropdown', appData.fuel_operations || []);
-      initSearchableSelect('fuel_supplier', 'fuel_supplier_dropdown', appData.fuel_suppliers || []);
-      initSearchableSelect('bunkerer', 'bunkerer_dropdown', appData.bunkerers || []);
-      initSearchableSelect('fuel_ship', 'fuel_ship_dropdown', appData.fuel_ships || []);
-      initSearchableSelect('fuel_type', 'fuel_type_dropdown', appData.fuel_types || []);
-      
-      const bunkeringPlaces = shipType === 'tug' ? (appData.bunkering_places_tug || []) : (appData.bunkering_places_self || []);
-      initSearchableSelect('bunkering_place', 'bunkering_place_dropdown', bunkeringPlaces);
-      initSearchableSelect('transfer_place', 'transfer_place_dropdown', appData.transfer_places || []);
-      
-      initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
-      initSearchableSelect('arrival_time', 'arrival_time_dropdown', appData.arrival_time || []);
-      initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
-      initSearchableSelect('sample', 'sample_dropdown', appData.sample || []);
+  initSearchableSelect('basin', 'basin_dropdown', basins);
+  
+  initSearchableSelect('client', 'client_dropdown', appData.clients || []);
+  initSearchableSelect('departure', 'departure_dropdown', appData.ports || []);
+  initSearchableSelect('destination', 'destination_dropdown', appData.ports || []);
+  
+  initSearchableSelect('status', 'status_dropdown', appData.statuses || []);
+  initSearchableSelect('ship_condition', 'ship_condition_dropdown', appData.ship_conditions || []);
+  initSearchableSelect('loading_works', 'loading_works_dropdown', appData.loading_works || []);
+  initSearchableSelect('ship_positioning', 'ship_positioning_dropdown', appData.ship_positioning || []);
+  initSearchableSelect('weather', 'weather_dropdown', appData.weather || []);
+  initSearchableSelect('wind_classification', 'wind_classification_dropdown', appData.wind || []);
+  initSearchableSelect('stop_cause', 'stop_cause_dropdown', appData.stop_reasons || []);
+  
+  initSearchableSelect('fuel_operation', 'fuel_operation_dropdown', appData.fuel_operations || []);
+  initSearchableSelect('fuel_supplier', 'fuel_supplier_dropdown', appData.fuel_suppliers || []);
+  initSearchableSelect('bunkerer', 'bunkerer_dropdown', appData.bunkerers || []);
+  initSearchableSelect('fuel_ship', 'fuel_ship_dropdown', appData.fuel_ships || []);
+  initSearchableSelect('fuel_type', 'fuel_type_dropdown', appData.fuel_types || []);
+  
+  const bunkeringPlaces = shipType === 'tug' ? (appData.bunkering_places_tug || []) : (appData.bunkering_places_self || []);
+  initSearchableSelect('bunkering_place', 'bunkering_place_dropdown', bunkeringPlaces);
+  initSearchableSelect('transfer_place', 'transfer_place_dropdown', appData.transfer_places || []);
+  
+  initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
+  initSearchableSelect('arrival_time', 'arrival_time_dropdown', appData.arrival_time || []);
+  initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
+  initSearchableSelect('sample', 'sample_dropdown', appData.sample || []);
 
-      setupConditionalLogic();
-    }
+  setupConditionalLogic();
+}
 
     function setupConditionalLogic() {
 // Бассейн -> Ориентир (умная проверка)
