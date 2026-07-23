@@ -560,65 +560,122 @@
       </div>
 
 <form id="dislocation_form">
-  <!-- Карточка 1: Местоположение (полная ширина) -->
-  <div class="card" style="margin-bottom: 20px;">
-    <div class="card-header">📍 Местоположение</div>
-    <div class="card-body">
-      <div class="form-grid" style="margin-top: 0;">
-        <label>Бассейн
-          <div class="searchable-select">
-            <input type="text" id="basin" name="basin" placeholder="Начните вводить..." required autocomplete="off">
-            <div class="searchable-dropdown" id="basin_dropdown"></div>
-          </div>
-        </label>
-        <label>Ориентир / Местоположение
-          <div class="searchable-select">
-            <input type="text" id="location" name="location" placeholder="Сначала выберите бассейн" disabled autocomplete="off">
-            <div class="searchable-dropdown" id="location_dropdown"></div>
-          </div>
-        </label>
-        <label>Погодные условия
-          <div class="searchable-select">
-            <input type="text" id="weather" name="weather" placeholder="Начните вводить..." autocomplete="off">
-            <div class="searchable-dropdown" id="weather_dropdown"></div>
-          </div>
-        </label>
-        <label>Классификация ветра/волнения
-          <div class="searchable-select">
-            <input type="text" id="wind_classification" name="wind_classification" placeholder="Начните вводить..." autocomplete="off">
-            <div class="searchable-dropdown" id="wind_classification_dropdown"></div>
-          </div>
-        </label>
-      </div>
+<!-- Карточка 1: Местоположение -->
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-header">📍 Местоположение</div>
+  <div class="card-body">
+    <div class="form-grid" style="margin-top: 0;">
+      <label>Бассейн
+        <div class="searchable-select">
+          <input type="text" id="basin" name="basin" placeholder="Начните вводить..." required autocomplete="off">
+          <div class="searchable-dropdown" id="basin_dropdown"></div>
+        </div>
+      </label>
+      <label>Ориентир / Местоположение
+        <div class="searchable-select">
+          <input type="text" id="location" name="location" placeholder="Сначала выберите бассейн" disabled autocomplete="off">
+          <div class="searchable-dropdown" id="location_dropdown"></div>
+        </div>
+      </label>
+      <label>Статус судна
+        <div class="searchable-select">
+          <input type="text" id="status" name="status" placeholder="— Выберите статус —" required autocomplete="off">
+          <div class="searchable-dropdown" id="status_dropdown"></div>
+        </div>
+      </label>
+      <label>Погодные условия
+        <div class="searchable-select">
+          <input type="text" id="weather" name="weather" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="weather_dropdown"></div>
+        </div>
+      </label>
+      <label>Классификация ветра/волнения
+        <div class="searchable-select">
+          <input type="text" id="wind_classification" name="wind_classification" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="wind_classification_dropdown"></div>
+        </div>
+      </label>
     </div>
   </div>
+</div>
 
-  <!-- Карточка 2: Рейс (полная ширина) -->
-  <div class="card" style="margin-bottom: 20px;">
-    <div class="card-header">🚢 Рейс</div>
-    <div class="card-body">
-      <div class="form-grid" style="margin-top: 0;">
-        <label>Клиент
+<!-- Карточка 2: Рейсовая информация (объединённая) -->
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-header">🚢 Рейсовая информация</div>
+  <div class="card-body">
+    <div class="form-grid" style="margin-top: 0;">
+      <!-- Блок Рейс -->
+      <label>Клиент
+        <div class="searchable-select">
+          <input type="text" id="client" name="client" placeholder="Начните вводить..." required autocomplete="off">
+          <div class="searchable-dropdown" id="client_dropdown"></div>
+        </div>
+      </label>
+      <label>Пункт отправления
+        <div class="searchable-select">
+          <input type="text" id="departure" name="departure" placeholder="Начните вводить..." required autocomplete="off">
+          <div class="searchable-dropdown" id="departure_dropdown"></div>
+        </div>
+      </label>
+      <label>Пункт назначения
+        <div class="searchable-select">
+          <input type="text" id="destination" name="destination" placeholder="Начните вводить..." required autocomplete="off">
+          <div class="searchable-dropdown" id="destination_dropdown"></div>
+        </div>
+      </label>
+
+      <!-- Блок Груз (самоход) -->
+      <div id="cargo_self">
+        <label>Род груза
           <div class="searchable-select">
-            <input type="text" id="client" name="client" placeholder="Начните вводить..." required autocomplete="off">
-            <div class="searchable-dropdown" id="client_dropdown"></div>
+            <input type="text" id="cargo_type" name="cargo_type" placeholder="Начните вводить..." autocomplete="off">
+            <div class="searchable-dropdown" id="cargo_type_dropdown"></div>
           </div>
         </label>
-        <label>Пункт отправления
-          <div class="searchable-select">
-            <input type="text" id="departure" name="departure" placeholder="Начните вводить..." required autocomplete="off">
-            <div class="searchable-dropdown" id="departure_dropdown"></div>
-          </div>
+        <label>Средняя осадка, см
+          <input type="text" name="draft_cm" inputmode="decimal" placeholder="Например: 280">
         </label>
-        <label>Пункт назначения
-          <div class="searchable-select">
-            <input type="text" id="destination" name="destination" placeholder="Начните вводить..." required autocomplete="off">
-            <div class="searchable-dropdown" id="destination_dropdown"></div>
-          </div>
+        <label>Кол-во груза, тн
+          <input type="text" name="cargo_amount" inputmode="decimal" placeholder="Например: 3000">
         </label>
+      </div>
+
+      <!-- Блок Груз (буксир) -->
+      <div id="cargo_tug" class="hidden">
+        <div class="section-block">
+          <strong>Носовая секция</strong>
+          <label>Род груза
+            <div class="searchable-select">
+              <input type="text" id="cargo_type_bow" name="cargo_type_bow" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="cargo_type_bow_dropdown"></div>
+            </div>
+          </label>
+          <label>Средняя осадка, см
+            <input type="text" name="draft_cm_bow" inputmode="decimal" placeholder="Например: 280">
+          </label>
+          <label>Кол-во груза, тн
+            <input type="text" name="cargo_amount_bow" inputmode="decimal" placeholder="Например: 1500">
+          </label>
+        </div>
+        <div class="section-block stern">
+          <strong>Кормовая секция</strong>
+          <label>Род груза
+            <div class="searchable-select">
+              <input type="text" id="cargo_type_stern" name="cargo_type_stern" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="cargo_type_stern_dropdown"></div>
+            </div>
+          </label>
+          <label>Средняя осадка, см
+            <input type="text" name="draft_cm_stern" inputmode="decimal" placeholder="Например: 280">
+          </label>
+          <label>Кол-во груза, тн
+            <input type="text" name="cargo_amount_stern" inputmode="decimal" placeholder="Например: 1500">
+          </label>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Карточка 3: Топливо (остатки) (полная ширина) -->
   <div class="card" style="margin-bottom: 20px;">
@@ -637,28 +694,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Карточка 4: Груз (полная ширина) -->
-  <div class="card" style="margin-bottom: 20px;">
-    <div class="card-header">📦 Груз</div>
-    <div class="card-body">
-      <!-- Для самоходных -->
-      <div id="cargo_self">
-        <div class="form-grid" style="margin-top: 0;">
-          <label>Род груза
-            <div class="searchable-select">
-              <input type="text" id="cargo_type" name="cargo_type" placeholder="Начните вводить..." autocomplete="off">
-              <div class="searchable-dropdown" id="cargo_type_dropdown"></div>
-            </div>
-          </label>
-          <label>Средняя осадка, см
-            <input type="text" name="draft_cm" inputmode="decimal" placeholder="Например: 280">
-          </label>
-          <label>Кол-во груза, тн
-            <input type="text" name="cargo_amount" inputmode="decimal" placeholder="Например: 3000">
-          </label>
-        </div>
-      </div>
 
       <!-- Для буксиров -->
       <div id="cargo_tug" class="hidden">
@@ -702,55 +737,49 @@
     </div>
   </div>
 
-  <!-- Карточка 5: Статус и состояние (полная ширина) -->
-  <div class="card" style="margin-bottom: 20px;">
-    <div class="card-header">⚓ Статус и состояние</div>
-    <div class="card-body">
-      <div class="form-grid" style="margin-top: 0;">
-        <label>Статус судна
-          <div class="searchable-select">
-            <input type="text" id="status" name="status" placeholder="— Выберите статус —" required autocomplete="off">
-            <div class="searchable-dropdown" id="status_dropdown"></div>
-          </div>
-        </label>
-        <label>Состояние судна
-          <div class="searchable-select">
-            <input type="text" id="ship_condition" name="ship_condition" placeholder="— Выберите состояние —" required autocomplete="off">
-            <div class="searchable-dropdown" id="ship_condition_dropdown"></div>
-          </div>
-        </label>
-        
-        <div id="stop_cause_section" class="hidden">
-          <label>Причина остановки
-            <div class="searchable-select">
-              <input type="text" id="stop_cause" name="stop_cause" placeholder="Начните вводить..." autocomplete="off">
-              <div class="searchable-dropdown" id="stop_cause_dropdown"></div>
-            </div>
-          </label>
+<!-- Карточка: Состояние судна -->
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-header"> Состояние судна</div>
+  <div class="card-body">
+    <div class="form-grid" style="margin-top: 0;">
+      <label>Состояние судна
+        <div class="searchable-select">
+          <input type="text" id="ship_condition" name="ship_condition" placeholder="— Выберите состояние —" required autocomplete="off">
+          <div class="searchable-dropdown" id="ship_condition_dropdown"></div>
         </div>
-
-        <label>Погрузо-разгрузочные работы
+      </label>
+      
+      <div id="stop_cause_section" class="hidden">
+        <label>Причина остановки
           <div class="searchable-select">
-            <input type="text" id="loading_works" name="loading_works" placeholder="Начните вводить..." autocomplete="off">
-            <div class="searchable-dropdown" id="loading_works_dropdown"></div>
-          </div>
-        </label>
-
-        <div id="stop_reason_section" class="hidden">
-          <label>Причина простоя на грузовых операциях
-            <input type="text" name="stop_reason" placeholder="Опишите причину...">
-          </label>
-        </div>
-
-        <label>Постановка судна
-          <div class="searchable-select">
-            <input type="text" id="ship_positioning" name="ship_positioning" placeholder="Начните вводить..." autocomplete="off">
-            <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
+            <input type="text" id="stop_cause" name="stop_cause" placeholder="Начните вводить..." autocomplete="off">
+            <div class="searchable-dropdown" id="stop_cause_dropdown"></div>
           </div>
         </label>
       </div>
+
+      <label>Погрузо-разгрузочные работы
+        <div class="searchable-select">
+          <input type="text" id="loading_works" name="loading_works" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="loading_works_dropdown"></div>
+        </div>
+      </label>
+
+      <div id="stop_reason_section" class="hidden">
+        <label>Причина простоя на грузовых операциях
+          <input type="text" name="stop_reason" placeholder="Опишите причину...">
+        </label>
+      </div>
+
+      <label>Постановка судна
+        <div class="searchable-select">
+          <input type="text" id="ship_positioning" name="ship_positioning" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
+        </div>
+      </label>
     </div>
   </div>
+</div>
 
   <!-- Карточка 6: Операции с ГСМ (полная ширина) -->
   <div class="card" style="margin-bottom: 20px;">
@@ -1185,16 +1214,16 @@
         }
       });
 
-      // Состояние судна -> Причина остановки
-      document.getElementById('ship_condition').addEventListener('input', function() {
-        const section = document.getElementById('stop_cause_section');
-        if (this.value.toLowerCase().includes('остановка')) {
-          section.classList.remove('hidden');
-        } else {
-          section.classList.add('hidden');
-          document.getElementById('stop_cause').value = '';
-        }
-      });
+// Статус судна -> Причина остановки
+document.getElementById('status').addEventListener('input', function() {
+  const section = document.getElementById('stop_cause_section');
+  if (this.value.toLowerCase().includes('остановка')) {
+    section.classList.remove('hidden');
+  } else {
+    section.classList.add('hidden');
+    document.getElementById('stop_cause').value = '';
+  }
+});
 
       // ПРР -> Причина простоя
       document.getElementById('loading_works').addEventListener('input', function() {
