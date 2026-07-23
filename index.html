@@ -73,7 +73,7 @@
     }
     
     .header-logo img {
-      width: 50px;
+      width: 80px;
       height: 50px;
     }
     
@@ -519,7 +519,7 @@
       <div id="network_status" class="status-badge">В сети</div>
       <button class="menu-btn" onclick="toggleMenu()">☰</button>
       <div id="dropdown_menu" class="dropdown-menu">
-        <button class="dropdown-item" onclick="toggleTheme()">Темная тема</button>
+        <button class="dropdown-item" id="theme_toggle_btn" onclick="toggleTheme()">Темная тема</button>
         <button class="dropdown-item danger" onclick="logout()">Выйти</button>
       </div>
     </div>
@@ -540,7 +540,10 @@
       
       <label style="text-align: left;">
         PIN-код (последние 4 цифры рабочего номера)
-        <input type="password" id="pin_input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="****" style="letter-spacing: 5px; font-size: 1.2em; text-align: center;">
+        <input type="password" id="pin_input" inputmode="numeric" pattern="[0-9]*" maxlength="4" 
+       placeholder="****" 
+       style="letter-spacing: 5px; font-size: 1.2em; text-align: center;"
+       onkeypress="if(event.key === 'Enter') { event.preventDefault(); tryLogin(); }">
       </label>
       
       <button class="btn" onclick="tryLogin()">Войти</button>
@@ -1495,17 +1498,31 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    function toggleTheme() {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
-      document.getElementById('dropdown_menu').classList.remove('show');
-    }
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  
+  // Меняем текст кнопки
+  const themeBtn = document.getElementById('theme_toggle_btn');
+  if (themeBtn) {
+    themeBtn.textContent = newTheme === 'dark' ? '️ Светлая тема' : ' Темная тема';
+  }
+  
+  document.getElementById('dropdown_menu').classList.remove('show');
+}
 
-    function loadTheme() {
-      const saved = localStorage.getItem('theme') || 'light';
-      document.documentElement.setAttribute('data-theme', saved);
-    }
+function loadTheme() {
+  const saved = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  
+  // Устанавливаем правильный текст кнопки при загрузке
+  const themeBtn = document.getElementById('theme_toggle_btn');
+  if (themeBtn) {
+    themeBtn.textContent = saved === 'dark' ? 'Светлая тема' : 'Темная тема';
+  }
+}
   </script>
 </body>
 </html>
