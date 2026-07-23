@@ -599,12 +599,11 @@
   </div>
 </div>
 
-<!-- Карточка 2: Рейсовая информация (объединённая) -->
+<!-- Карточка 2: Рейсовая информация -->
 <div class="card" style="margin-bottom: 20px;">
-  <div class="card-header">🚢 Рейсовая информация</div>
+  <div class="card-header"> Рейсовая информация</div>
   <div class="card-body">
-    <div class="form-grid" style="margin-top: 0;">
-      <!-- Блок Рейс -->
+    <div class="form-grid">
       <label>Клиент
         <div class="searchable-select">
           <input type="text" id="client" name="client" placeholder="Начните вводить..." required autocomplete="off">
@@ -625,7 +624,7 @@
       </label>
 
       <!-- Блок Груз (самоход) -->
-      <div id="cargo_self">
+      <div id="cargo_self" style="display: contents;">
         <label>Род груза
           <div class="searchable-select">
             <input type="text" id="cargo_type" name="cargo_type" placeholder="Начните вводить..." autocomplete="off">
@@ -641,7 +640,7 @@
       </div>
 
       <!-- Блок Груз (буксир) -->
-      <div id="cargo_tug" class="hidden">
+      <div id="cargo_tug" class="hidden" style="display: contents;">
         <div class="section-block">
           <strong>Носовая секция</strong>
           <label>Род груза
@@ -739,91 +738,89 @@
   </div>
 </div>
 
-  <!-- Карточка 6: Операции с ГСМ (полная ширина) -->
-  <div class="card" style="margin-bottom: 20px;">
-    <div class="card-header">⛽ Операции с ГСМ</div>
-    <div class="card-body">
-      <div class="form-grid" style="margin-top: 0;">
-        <div>
-          <label>Операции с ГСМ
+<!-- Карточка: Операции с ГСМ -->
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-header">⛽ Операции с ГСМ</div>
+  <div class="card-body">
+    <div class="form-grid">
+      <label>Операции с ГСМ
+        <div class="searchable-select">
+          <input type="text" id="fuel_operation" name="fuel_operation" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="fuel_operation_dropdown"></div>
+        </div>
+      </label>
+
+      <div id="bunkering_details" class="hidden" style="grid-column: 1 / -1;">
+        <div class="section-block">
+          <strong>Детали бункеровки</strong>
+          <label>Дата бункеровки 
+            <input type="datetime-local" name="bunkering_date">
+          </label>
+          <label>Поставщик ГСМ
             <div class="searchable-select">
-              <input type="text" id="fuel_operation" name="fuel_operation" placeholder="Начните вводить..." autocomplete="off">
-              <div class="searchable-dropdown" id="fuel_operation_dropdown"></div>
+              <input type="text" id="fuel_supplier" name="fuel_supplier" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="fuel_supplier_dropdown"></div>
             </div>
           </label>
-
-          <div id="bunkering_details" class="hidden">
-            <div class="section-block">
-              <strong>Детали бункеровки</strong>
-              <label>Дата бункеровки 
-                <input type="datetime-local" name="bunkering_date">
-              </label>
-              <label>Поставщик ГСМ
-                <div class="searchable-select">
-                  <input type="text" id="fuel_supplier" name="fuel_supplier" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="fuel_supplier_dropdown"></div>
-                </div>
-              </label>
-              <label>Номер заявки на топливо 
-                <input type="text" name="fuel_request_number" inputmode="numeric">
-              </label>
-              <label>Место бункеровки
-                <div class="searchable-select">
-                  <input type="text" id="bunkering_place" name="bunkering_place" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="bunkering_place_dropdown"></div>
-                </div>
-              </label>
-              <label>Бункеровщик
-                <div class="searchable-select">
-                  <input type="text" id="bunkerer" name="bunkerer" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="bunkerer_dropdown"></div>
-                </div>
-              </label>
-              <label>Получено ДТ, тн 
-                <input type="text" name="fuel_received_dt" inputmode="decimal">
-              </label>
-              <label>Получено ДМ, тн 
-                <input type="text" name="fuel_received_dm" inputmode="decimal">
-              </label>
+          <label>Номер заявки на топливо 
+            <input type="text" name="fuel_request_number" inputmode="numeric">
+          </label>
+          <label>Место бункеровки
+            <div class="searchable-select">
+              <input type="text" id="bunkering_place" name="bunkering_place" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="bunkering_place_dropdown"></div>
             </div>
-          </div>
-
-          <div id="transfer_details" class="hidden">
-            <div class="section-block stern">
-              <strong>Детали перекачки</strong>
-              <label>Дата перекачки 
-                <input type="datetime-local" name="transfer_date">
-              </label>
-              <label>Место перекачки
-                <div class="searchable-select">
-                  <input type="text" id="transfer_place" name="transfer_place" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="transfer_place_dropdown"></div>
-                </div>
-              </label>
-              <label>ГСМ
-                <div class="searchable-select">
-                  <input type="text" id="fuel_type" name="fuel_type" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="fuel_type_dropdown"></div>
-                </div>
-              </label>
-              <label>Судно
-                <div class="searchable-select">
-                  <input type="text" id="fuel_ship" name="fuel_ship" placeholder="Начните вводить..." autocomplete="off">
-                  <div class="searchable-dropdown" id="fuel_ship_dropdown"></div>
-                </div>
-              </label>
-              <label>Перекачено ДТ, тн 
-                <input type="text" name="fuel_transferred_dt" inputmode="decimal">
-              </label>
-              <label>Перекачено ДМ, тн 
-                <input type="text" name="fuel_transferred_dm" inputmode="decimal">
-              </label>
+          </label>
+          <label>Бункеровщик
+            <div class="searchable-select">
+              <input type="text" id="bunkerer" name="bunkerer" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="bunkerer_dropdown"></div>
             </div>
-          </div>
+          </label>
+          <label>Получено ДТ, тн 
+            <input type="text" name="fuel_received_dt" inputmode="decimal">
+          </label>
+          <label>Получено ДМ, тн 
+            <input type="text" name="fuel_received_dm" inputmode="decimal">
+          </label>
+        </div>
+      </div>
+
+      <div id="transfer_details" class="hidden" style="grid-column: 1 / -1;">
+        <div class="section-block stern">
+          <strong>Детали перекачки</strong>
+          <label>Дата перекачки 
+            <input type="datetime-local" name="transfer_date">
+          </label>
+          <label>Место перекачки
+            <div class="searchable-select">
+              <input type="text" id="transfer_place" name="transfer_place" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="transfer_place_dropdown"></div>
+            </div>
+          </label>
+          <label>ГСМ
+            <div class="searchable-select">
+              <input type="text" id="fuel_type" name="fuel_type" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="fuel_type_dropdown"></div>
+            </div>
+          </label>
+          <label>Судно
+            <div class="searchable-select">
+              <input type="text" id="fuel_ship" name="fuel_ship" placeholder="Начните вводить..." autocomplete="off">
+              <div class="searchable-dropdown" id="fuel_ship_dropdown"></div>
+            </div>
+          </label>
+          <label>Перекачено ДТ, тн 
+            <input type="text" name="fuel_transferred_dt" inputmode="decimal">
+          </label>
+          <label>Перекачено ДМ, тн 
+            <input type="text" name="fuel_transferred_dm" inputmode="decimal">
+          </label>
         </div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Карточка 7: График работ (полная ширина, всегда видна) -->
   <div class="card" style="margin-bottom: 20px;">
@@ -852,72 +849,69 @@
     </div>
   </div>
 
-  <!-- Карточка 8: Происшествия и пробы (полная ширина, всегда видна) -->
-  <div class="card" style="margin-bottom: 20px;">
-    <div class="card-header">⚠️ Происшествия и пробы</div>
-    <div class="card-body">
-      <div class="form-grid" style="margin-top: 0;">
-        <div>
-          <label>Вид транспортного происшествия
-            <div class="searchable-select">
-              <input type="text" id="accident_type" name="accident_type" placeholder="Начните вводить..." autocomplete="off">
-              <div class="searchable-dropdown" id="accident_type_dropdown"></div>
-            </div>
-          </label>
-          <div id="accident_details" class="hidden">
-            <label>С кем произошло 
-              <input type="text" name="accident_with" placeholder="Название судна/объекта">
-            </label>
-            <label>Местоположение происшествия 
-              <input type="text" name="accident_location" placeholder="Где произошло">
-            </label>
-          </div>
-          
-          <label>Описание ремонтных работ
-            <textarea name="repair_description" rows="3" placeholder="Опишите ремонт..."></textarea>
-          </label>
+<!-- Карточка: Происшествия и пробы -->
+<div class="card" style="margin-bottom: 20px;">
+  <div class="card-header">️ Происшествия и пробы</div>
+  <div class="card-body">
+    <div class="form-grid">
+      <label>Вид транспортного происшествия
+        <div class="searchable-select">
+          <input type="text" id="accident_type" name="accident_type" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="accident_type_dropdown"></div>
         </div>
-        
-        <div>
-          <label>Проверка видеонаблюдения
-            <div class="searchable-select">
-              <input type="text" id="video_check" name="video_check" placeholder="Начните вводить..." autocomplete="off">
-              <div class="searchable-dropdown" id="video_check_dropdown"></div>
-            </div>
+      </label>
+
+      <div id="accident_details" class="hidden" style="grid-column: 1 / -1;">
+        <label>С кем произошло 
+          <input type="text" name="accident_with" placeholder="Название судна/объекта">
+        </label>
+        <label>Местоположение происшествия 
+          <input type="text" name="accident_location" placeholder="Где произошло">
+        </label>
+      </div>
+
+      <label style="grid-column: 1 / -1;">Описание ремонтных работ
+        <textarea name="repair_description" rows="3" placeholder="Опишите ремонт..."></textarea>
+      </label>
+
+      <label>Проверка видеонаблюдения
+        <div class="searchable-select">
+          <input type="text" id="video_check" name="video_check" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="video_check_dropdown"></div>
+        </div>
+      </label>
+
+      <label>Проба
+        <div class="searchable-select">
+          <input type="text" id="sample" name="sample" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="sample_dropdown"></div>
+        </div>
+      </label>
+
+      <div id="sample_details" class="hidden" style="grid-column: 1 / -1;">
+        <div class="section-block stern">
+          <strong>Детали пробы</strong>
+          <label>Дата передачи пробы 
+            <input type="datetime-local" name="sample_date">
           </label>
-
-          <label>Проба
-            <div class="searchable-select">
-              <input type="text" id="sample" name="sample" placeholder="Начните вводить..." autocomplete="off">
-              <div class="searchable-dropdown" id="sample_dropdown"></div>
-            </div>
+          <label>Номер пробы 
+            <input type="text" name="sample_number" inputmode="numeric">
           </label>
-
-          <div id="sample_details" class="hidden">
-            <div class="section-block stern">
-              <strong>Детали пробы</strong>
-              <label>Дата передачи пробы 
-                <input type="datetime-local" name="sample_date">
-              </label>
-              <label>Номер пробы 
-                <input type="text" name="sample_number" inputmode="numeric">
-              </label>
-              <label>ФИО сдавшего от судна 
-                <input type="text" name="sample_given_by">
-              </label>
-              <label>ФИО принявшего от компании 
-                <input type="text" name="sample_received_by">
-              </label>
-            </div>
-          </div>
-
-          <label>Горящие вопросы
-            <textarea name="burning_questions" rows="2" placeholder="Есть ли вопросы?"></textarea>
+          <label>ФИО сдавшего от судна 
+            <input type="text" name="sample_given_by">
+          </label>
+          <label>ФИО принявшего от компании 
+            <input type="text" name="sample_received_by">
           </label>
         </div>
       </div>
+
+      <label style="grid-column: 1 / -1;">Горящие вопросы
+        <textarea name="burning_questions" rows="2" placeholder="Есть ли вопросы?"></textarea>
+      </label>
     </div>
   </div>
+</div>
 
   <button type="submit" class="btn" style="max-width: 600px; margin: 20px auto; display: block;">🚀 ОТПРАВИТЬ</button>
 </form>
