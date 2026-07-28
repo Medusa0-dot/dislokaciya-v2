@@ -1201,6 +1201,24 @@
     }
 
 function setupConditionalLogic() {
+  // Вспомогательная функция для безопасной очистки поля
+  function safeClearValue(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) el.value = '';
+  }
+  
+  // Вспомогательная функция для безопасного скрытия элемента
+  function safeHide(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) el.classList.add('hidden');
+  }
+  
+  // Вспомогательная функция для безопасного показа элемента
+  function safeShow(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) el.classList.remove('hidden');
+  }
+
   // === 1. СТАТУС СУДНА → управление всей логикой ===
   document.getElementById('status').addEventListener('input', function() {
     const val = this.value;
@@ -1208,27 +1226,29 @@ function setupConditionalLogic() {
     const isPribyli = val.toLowerCase().includes('прибыли');
     
     // Скрываем всё сначала
-    document.getElementById('ship_condition_wrapper').classList.add('hidden');
-    document.getElementById('in_transit_block').classList.add('hidden');
-    document.getElementById('stop_block').classList.add('hidden');
-    document.getElementById('loading_block').classList.add('hidden');
+    safeHide('ship_condition_wrapper');
+    safeHide('in_transit_block');
+    safeHide('stop_block');
+    safeHide('loading_block');
+    safeHide('queue_block');
+    safeHide('fleet_block');
     
     // Очищаем зависимые поля
-    document.getElementById('ship_condition').value = '';
-    document.getElementById('arrival_time').value = '';
-    document.getElementById('queue_info').value = '';
-    document.getElementById('fleet_name').value = '';
-    document.getElementById('stop_cause').value = '';
-    document.getElementById('stop_datetime').value = '';
-    document.getElementById('movement_estimate_start').value = '';
-    document.getElementById('arrival_estimate').value = '';
+    safeClearValue('ship_condition');
+    safeClearValue('arrival_time');
+    safeClearValue('queue_info');
+    safeClearValue('fleet_name');
+    safeClearValue('stop_cause');
+    safeClearValue('stop_datetime');
+    safeClearValue('movement_estimate_start');
+    safeClearValue('arrival_estimate');
+    safeClearValue('loading_works');
+    safeClearValue('ship_positioning');
     
     if (isVReyse) {
-      // Показываем "Состояние судна"
-      document.getElementById('ship_condition_wrapper').classList.remove('hidden');
+      safeShow('ship_condition_wrapper');
     } else if (isPribyli) {
-      // Показываем блок ПРР
-      document.getElementById('loading_block').classList.remove('hidden');
+      safeShow('loading_block');
     }
   });
 
@@ -1238,109 +1258,156 @@ function setupConditionalLogic() {
     const isVHodu = val.toLowerCase().includes('в ходу');
     const isOstanovka = val.toLowerCase().includes('остановка');
     
-    // Скрываем оба блока
-    document.getElementById('in_transit_block').classList.add('hidden');
-    document.getElementById('stop_block').classList.add('hidden');
+    safeHide('in_transit_block');
+    safeHide('stop_block');
+    safeHide('queue_block');
+    safeHide('fleet_block');
     
-    // Очищаем поля
-    document.getElementById('arrival_time').value = '';
-    document.getElementById('queue_info').value = '';
-    document.getElementById('fleet_name').value = '';
-    document.getElementById('stop_cause').value = '';
-    document.getElementById('stop_datetime').value = '';
-    document.getElementById('movement_estimate_start').value = '';
-    document.getElementById('arrival_estimate').value = '';
+    safeClearValue('arrival_time');
+    safeClearValue('queue_info');
+    safeClearValue('fleet_name');
+    safeClearValue('stop_cause');
+    safeClearValue('stop_datetime');
+    safeClearValue('movement_estimate_start');
+    safeClearValue('arrival_estimate');
     
     if (isVHodu) {
-      document.getElementById('in_transit_block').classList.remove('hidden');
+      safeShow('in_transit_block');
     } else if (isOstanovka) {
-      document.getElementById('stop_block').classList.remove('hidden');
+      safeShow('stop_block');
     }
   });
 
   // === 3. ДО ПРИБЫТИЯ ОСТАЛОСЬ → очередь ===
-  document.getElementById('arrival_time').addEventListener('input', function() {
-    const val = this.value.toLowerCase();
-    const isMenee24 = val.includes('менее');
-    
-    document.getElementById('queue_block').classList.toggle('hidden', !isMenee24);
-    
-    // Очищаем очередь если скрыли
-    if (!isMenee24) {
-      document.getElementById('queue_info').value = '';
-      document.getElementById('fleet_name').value = '';
-      document.getElementById('fleet_block').classList.add('hidden');
-    }
-  });
+  const arrivalTimeInput = document.getElementById('arrival_time');
+  if (arrivalTimeInput) {
+    arrivalTimeInput.addEventListener('input', function() {
+      const val = this.value.toLowerCase();
+      const isMenee24 = val.includes('менее');
+      
+      const queueBlock = document.getElementById('queue_block');
+      if (queueBlock) {
+        queueBlock.classList.toggle('hidden', !isMenee24);
+      }
+      
+      if (!isMenee24) {
+        safeClearValue('queue_info');
+        safeClearValue('fleet_name');
+        safeHide('fleet_block');
+      }
+    });
+  }
 
   // === 4. ОЧЕРЕДЬ → название флота ===
-  document.getElementById('queue_info').addEventListener('input', function() {
-    const val = this.value;
-    const isOchered = val === 'Очередь';
-    document.getElementById('fleet_block').classList.toggle('hidden', !isOchered);
-    
-    if (!isOchered) {
-      document.getElementById('fleet_name').value = '';
-    }
-  });
+  const queueInfoInput = document.getElementById('queue_info');
+  if (queueInfoInput) {
+    queueInfoInput.addEventListener('input', function() {
+      const val = this.value;
+      const isOchered = val === 'Очередь';
+      
+      const fleetBlock = document.getElementById('fleet_block');
+      if (fleetBlock) {
+        fleetBlock.classList.toggle('hidden', !isOchered);
+      }
+      
+      if (!isOchered) {
+        safeClearValue('fleet_name');
+      }
+    });
+  }
 
   // === 5. ПОГРУЗО-РАЗГРУЗОЧНЫЕ РАБОТЫ → причина простоя ===
-  document.getElementById('loading_works').addEventListener('input', function() {
-    const section = document.getElementById('stop_reason_section');
-    if (this.value.toLowerCase().includes('приостановили')) {
-      section.classList.remove('hidden');
-    } else {
-      section.classList.add('hidden');
-      document.querySelector('[name="stop_reason"]').value = '';
-    }
-  });
+  const loadingWorksInput = document.getElementById('loading_works');
+  if (loadingWorksInput) {
+    loadingWorksInput.addEventListener('input', function() {
+      const stopReasonSection = document.getElementById('stop_reason_section');
+      if (stopReasonSection) {
+        if (this.value.toLowerCase().includes('приостановили')) {
+          stopReasonSection.classList.remove('hidden');
+        } else {
+          stopReasonSection.classList.add('hidden');
+          const stopReasonInput = document.querySelector('[name="stop_reason"]');
+          if (stopReasonInput) stopReasonInput.value = '';
+        }
+      }
+    });
+  }
 
   // === 6. ТРАНСПОРТНОЕ ПРОИСШЕСТВИЕ → детали ===
-  document.getElementById('accident_type').addEventListener('input', function() {
-    document.getElementById('accident_details').classList.toggle('hidden', !this.value);
-  });
+  const accidentTypeInput = document.getElementById('accident_type');
+  if (accidentTypeInput) {
+    accidentTypeInput.addEventListener('input', function() {
+      const accidentDetails = document.getElementById('accident_details');
+      if (accidentDetails) {
+        accidentDetails.classList.toggle('hidden', !this.value);
+      }
+    });
+  }
 
   // === 7. ПРОБА → детали пробы ===
-  document.getElementById('sample').addEventListener('input', function() {
-    const val = this.value.toLowerCase();
-    const showDetails = val.includes('передава') && !val.includes('не ');
-    document.getElementById('sample_details').classList.toggle('hidden', !showDetails);
-  });
+  const sampleInput = document.getElementById('sample');
+  if (sampleInput) {
+    sampleInput.addEventListener('input', function() {
+      const val = this.value.toLowerCase();
+      const showDetails = val.includes('передава') && !val.includes('не ');
+      
+      const sampleDetails = document.getElementById('sample_details');
+      if (sampleDetails) {
+        sampleDetails.classList.toggle('hidden', !showDetails);
+      }
+    });
+  }
 
   // === 8. ОПЕРАЦИИ С ГСМ → бункеровка/перекачка ===
-  document.getElementById('fuel_operation').addEventListener('input', function() {
-    const val = this.value.toLowerCase();
-    document.getElementById('bunkering_details').classList.toggle('hidden', !val.includes('бункер'));
-    document.getElementById('transfer_details').classList.toggle('hidden', !val.includes('перекач'));
-  });
+  const fuelOperationInput = document.getElementById('fuel_operation');
+  if (fuelOperationInput) {
+    fuelOperationInput.addEventListener('input', function() {
+      const val = this.value.toLowerCase();
+      
+      const bunkeringDetails = document.getElementById('bunkering_details');
+      if (bunkeringDetails) {
+        bunkeringDetails.classList.toggle('hidden', !val.includes('бункер'));
+      }
+      
+      const transferDetails = document.getElementById('transfer_details');
+      if (transferDetails) {
+        transferDetails.classList.toggle('hidden', !val.includes('перекач'));
+      }
+    });
+  }
 
   // === 9. БАССЕЙН → ОРИЕНТИР ===
-  document.getElementById('basin').addEventListener('input', function() {
-    const basin = this.value;
-    const locationKey = getLocationKeyForBasin(basin);
-    const locationInput = document.getElementById('location');
-    const locationDropdown = document.getElementById('location_dropdown');
-    
-    if (locationKey && appData[locationKey] && appData[locationKey].length > 0) {
-      locationInput.disabled = false;
-      locationInput.placeholder = 'Начните вводить...';
-      locationInput.value = '';
+  const basinInput = document.getElementById('basin');
+  if (basinInput) {
+    basinInput.addEventListener('input', function() {
+      const basin = this.value;
+      const locationKey = getLocationKeyForBasin(basin);
+      const locationInput = document.getElementById('location');
+      const locationDropdown = document.getElementById('location_dropdown');
       
-      delete locationInput.dataset.searchableInit;
-      locationDropdown.innerHTML = '';
-      locationDropdown.classList.remove('show');
-      
-      setTimeout(() => {
-        initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
-      }, 100);
-    } else {
-      locationInput.value = '';
-      locationInput.disabled = true;
-      locationInput.placeholder = 'Сначала выберите бассейн';
-      locationDropdown.innerHTML = '';
-      locationDropdown.classList.remove('show');
-    }
-  });
+      if (locationInput && locationDropdown) {
+        if (locationKey && appData[locationKey] && appData[locationKey].length > 0) {
+          locationInput.disabled = false;
+          locationInput.placeholder = 'Начните вводить...';
+          locationInput.value = '';
+          
+          delete locationInput.dataset.searchableInit;
+          locationDropdown.innerHTML = '';
+          locationDropdown.classList.remove('show');
+          
+          setTimeout(() => {
+            initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
+          }, 100);
+        } else {
+          locationInput.value = '';
+          locationInput.disabled = true;
+          locationInput.placeholder = 'Сначала выберите бассейн';
+          locationDropdown.innerHTML = '';
+          locationDropdown.classList.remove('show');
+        }
+      }
+    });
+  }
 }
 
     // === ПОИСК В ВЫПАДАЮЩИХ СПИСКАХ ===
