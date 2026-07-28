@@ -502,6 +502,17 @@
         padding: 15px 10px;
       }
     }
+    /* Стили для чекбоксов погоды */
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+input[type="checkbox"]:hover {
+  transform: scale(1.1);
+}
   </style>
 </head>
 <body>
@@ -564,7 +575,7 @@
 <div class="card" style="margin-bottom: 20px;">
   <div class="card-header">📍 Местоположение</div>
   <div class="card-body">
-    <div class="form-grid" style="margin-top: 0;">
+    <div class="form-grid">
       <label>Бассейн
         <div class="searchable-select">
           <input type="text" id="basin" name="basin" placeholder="Начните вводить..." required autocomplete="off">
@@ -581,18 +592,6 @@
         <div class="searchable-select">
           <input type="text" id="status" name="status" placeholder="— Выберите статус —" required autocomplete="off">
           <div class="searchable-dropdown" id="status_dropdown"></div>
-        </div>
-      </label>
-      <label>Погодные условия
-        <div class="searchable-select">
-          <input type="text" id="weather" name="weather" placeholder="Начните вводить..." autocomplete="off">
-          <div class="searchable-dropdown" id="weather_dropdown"></div>
-        </div>
-      </label>
-      <label>Классификация ветра/волнения
-        <div class="searchable-select">
-          <input type="text" id="wind_classification" name="wind_classification" placeholder="Начните вводить..." autocomplete="off">
-          <div class="searchable-dropdown" id="wind_classification_dropdown"></div>
         </div>
       </label>
     </div>
@@ -700,7 +699,7 @@
   <div class="card-body">
     <div class="form-grid">
       
-      <!-- Состояние судна (показывается только если статус = "В рейсе") -->
+      <!-- Состояние судна (только для "В рейсе") -->
       <div id="ship_condition_wrapper" class="hidden" style="grid-column: 1 / -1;">
         <label>Состояние судна
           <div class="searchable-select">
@@ -710,7 +709,7 @@
         </label>
       </div>
 
-      <!-- === БЛОК: В ХОДУ === -->
+      <!-- БЛОК: В ХОДУ -->
       <div id="in_transit_block" class="hidden" style="grid-column: 1 / -1;">
         <div class="section-block">
           <strong>Судно в ходу</strong>
@@ -726,7 +725,6 @@
             </label>
           </div>
           
-          <!-- Очередь (показывается если "менее 24 часов") -->
           <div id="queue_block" class="hidden" style="margin-top: 15px;">
             <div class="form-grid">
               <label>Очередь на грузовых операциях
@@ -735,8 +733,6 @@
                   <div class="searchable-dropdown" id="queue_info_dropdown"></div>
                 </div>
               </label>
-              
-              <!-- Название флота (показывается если "Очередь") -->
               <div id="fleet_block" class="hidden">
                 <label>Название флота в очереди
                   <input type="text" name="fleet_name" placeholder="Введите название флота">
@@ -747,7 +743,7 @@
         </div>
       </div>
 
-      <!-- === БЛОК: ОСТАНОВКА СУДНА === -->
+      <!-- БЛОК: ОСТАНОВКА СУДНА -->
       <div id="stop_block" class="hidden" style="grid-column: 1 / -1;">
         <div class="section-block stern">
           <strong>Остановка судна</strong>
@@ -765,74 +761,218 @@
               <input type="datetime-local" name="movement_estimate_start">
             </label>
           </div>
+
+          <!-- Подблок: Ожидание улучшения погоды -->
+          <div id="weather_block" class="hidden" style="margin-top: 15px;">
+            <div class="section-block">
+              <strong>Погодные условия (выберите все подходящие)</strong>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="ветер 10-15 м/с" style="width: auto; margin: 0;"> ветер 10-15 м/с
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="ветер 15-20 м/с" style="width: auto; margin: 0;"> ветер 15-20 м/с
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="ветер 20-25 м/с" style="width: auto; margin: 0;"> ветер 20-25 м/с
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="волна 1,5-2,0 м" style="width: auto; margin: 0;"> волна 1,5-2,0 м
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="волна 2,0-2,5 м" style="width: auto; margin: 0;"> волна 2,0-2,5 м
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="волна 2,5-3,0 м" style="width: auto; margin: 0;"> волна 2,5-3,0 м
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="волна 3,0-3,5 м" style="width: auto; margin: 0;"> волна 3,0-3,5 м
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="снегопад" style="width: auto; margin: 0;"> снегопад
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="туман" style="width: auto; margin: 0;"> туман
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="ледовая обстановка" style="width: auto; margin: 0;"> ледовая обстановка
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="видимость менее 1км" style="width: auto; margin: 0;"> видимость менее 1км
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                  <input type="checkbox" name="weather_conditions" value="другое" style="width: auto; margin: 0;" id="weather_other_checkbox"> другое
+                </label>
+              </div>
+              <div id="weather_other_block" class="hidden" style="margin-top: 15px;">
+                <label>Другое (укажите)
+                  <input type="text" name="weather_other" placeholder="Опишите погодные условия...">
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Подблок: Бункеровка топливом -->
+          <div id="fuel_stop_block" class="hidden" style="margin-top: 15px;">
+            <div class="section-block">
+              <strong>Бункеровка / Перекачка</strong>
+              <div class="form-grid" style="margin-top: 15px;">
+                <label>Вид операции
+                  <div class="searchable-select">
+                    <input type="text" id="fuel_operation" name="fuel_operation" placeholder="— Выберите вид —" autocomplete="off">
+                    <div class="searchable-dropdown" id="fuel_operation_dropdown"></div>
+                  </div>
+                </label>
+              </div>
+              
+              <div id="bunkering_details" class="hidden" style="margin-top: 15px;">
+                <div class="form-grid">
+                  <label>Дата бункеровки <input type="datetime-local" name="bunkering_date"></label>
+                  <label>Поставщик ГСМ
+                    <div class="searchable-select">
+                      <input type="text" id="fuel_supplier" name="fuel_supplier" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="fuel_supplier_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Номер заявки на топливо <input type="text" name="fuel_request_number" inputmode="numeric"></label>
+                  <label>Место бункеровки
+                    <div class="searchable-select">
+                      <input type="text" id="bunkering_place" name="bunkering_place" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="bunkering_place_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Бункеровщик
+                    <div class="searchable-select">
+                      <input type="text" id="bunkerer" name="bunkerer" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="bunkerer_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Получено ДТ, тн <input type="text" name="fuel_received_dt" inputmode="decimal"></label>
+                  <label>Получено ДМ, тн <input type="text" name="fuel_received_dm" inputmode="decimal"></label>
+                </div>
+              </div>
+
+              <div id="transfer_details" class="hidden" style="margin-top: 15px;">
+                <div class="form-grid">
+                  <label>Дата перекачки <input type="datetime-local" name="transfer_date"></label>
+                  <label>Место перекачки
+                    <div class="searchable-select">
+                      <input type="text" id="transfer_place" name="transfer_place" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="transfer_place_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>ГСМ
+                    <div class="searchable-select">
+                      <input type="text" id="fuel_type" name="fuel_type" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="fuel_type_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Судно
+                    <div class="searchable-select">
+                      <input type="text" id="fuel_ship" name="fuel_ship" placeholder="Начните вводить..." autocomplete="off">
+                      <div class="searchable-dropdown" id="fuel_ship_dropdown"></div>
+                    </div>
+                  </label>
+                  <label>Перекачено ДТ, тн <input type="text" name="fuel_transferred_dt" inputmode="decimal"></label>
+                  <label>Перекачено ДМ, тн <input type="text" name="fuel_transferred_dm" inputmode="decimal"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Подблок: Ремонтные работы -->
+          <div id="repair_block" class="hidden" style="margin-top: 15px;">
+            <div class="section-block">
+              <strong>Ремонтные работы</strong>
+              <label style="margin-top: 15px;">Описание ремонтных работ
+                <textarea name="repair_description" rows="3" placeholder="Опишите ремонт..."></textarea>
+              </label>
+            </div>
+          </div>
+
+          <!-- Подблок: Транспортное происшествие -->
+          <div id="accident_stop_block" class="hidden" style="margin-top: 15px;">
+            <div class="section-block stern">
+              <strong>Транспортное происшествие</strong>
+              <div class="form-grid" style="margin-top: 15px;">
+                <label>Вид транспортного происшествия
+                  <div class="searchable-select">
+                    <input type="text" id="accident_type" name="accident_type" placeholder="— Выберите вид —" autocomplete="off">
+                    <div class="searchable-dropdown" id="accident_type_dropdown"></div>
+                  </div>
+                </label>
+              </div>
+              <div id="accident_ship_block" class="hidden" style="margin-top: 15px;">
+                <label>Название судна/объекта с кем произошло
+                  <input type="text" name="accident_with" placeholder="Введите название судна или объекта">
+                </label>
+              </div>
+              <div id="accident_other_block" class="hidden" style="margin-top: 15px;">
+                <label>Другое (укажите)
+                  <input type="text" name="accident_other" placeholder="Опишите вид происшествия...">
+                </label>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- Погрузо-разгрузочные работы (показывается для статусов "Прибыли на...") -->
+      <!-- БЛОК: ПРИБЫЛИ НА ПОГРУЗКУ/ВЫГРУЗКУ -->
       <div id="loading_block" class="hidden" style="grid-column: 1 / -1;">
-        <label>Погрузо-разгрузочные работы
-          <div class="searchable-select">
-            <input type="text" id="loading_works" name="loading_works" placeholder="— Выберите —" autocomplete="off">
-            <div class="searchable-dropdown" id="loading_works_dropdown"></div>
+        <div class="section-block">
+          <strong>Погрузо-разгрузочные работы</strong>
+          <div class="form-grid" style="margin-top: 15px;">
+            <label>Погрузо-разгрузочные работы
+              <div class="searchable-select">
+                <input type="text" id="loading_works" name="loading_works" placeholder="— Выберите —" autocomplete="off">
+                <div class="searchable-dropdown" id="loading_works_dropdown"></div>
+              </div>
+            </label>
+            <label>Постановка судна
+              <div class="searchable-select">
+                <input type="text" id="ship_positioning" name="ship_positioning" placeholder="— Выберите —" autocomplete="off">
+                <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
+              </div>
+            </label>
           </div>
-        </label>
 
-        <div id="stop_reason_section" class="hidden">
-          <label>Причина простоя на грузовых операциях
-            <input type="text" name="stop_reason" placeholder="Опишите причину...">
-          </label>
+          <div id="stop_reason_section" class="hidden" style="margin-top: 15px;">
+            <label>Причина простоя на грузовых операциях
+              <input type="text" name="stop_reason" placeholder="Опишите причину...">
+            </label>
+          </div>
+
+          <div class="form-grid" style="margin-top: 15px;">
+            <label>Прибытие на грузовые работы (нотис)
+              <input type="datetime-local" name="notice_arrival">
+            </label>
+            <label>Начало грузовых работ
+              <input type="datetime-local" name="loading_start">
+            </label>
+            <label>Окончание грузовых работ
+              <input type="datetime-local" name="loading_end">
+            </label>
+            <label>Прохождение Городецкого шлюза
+              <input type="datetime-local" name="gorodets_lock">
+            </label>
+          </div>
         </div>
-
-        <label>Постановка судна
-          <div class="searchable-select">
-            <input type="text" id="ship_positioning" name="ship_positioning" placeholder="— Выберите —" autocomplete="off">
-            <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
-          </div>
-        </label>
       </div>
 
     </div>
   </div>
 </div>
-
-  <!-- Карточка 7: График работ (полная ширина, всегда видна) -->
-  <div class="card" style="margin-bottom: 20px;">
-    <div class="card-header">⏱️ График работ</div>
-    <div class="card-body">
-      <div class="form-grid" style="margin-top: 0;">
-        <label>Прибытие на грузовые работы (нотис)
-          <input type="datetime-local" name="notice_arrival">
-        </label>
-        <label>Начало грузовых работ
-          <input type="datetime-local" name="loading_start">
-        </label>
-        <label>Окончание грузовых работ
-          <input type="datetime-local" name="loading_end">
-        </label>
-        <label>До прибытия на грузовые операции осталось
-          <div class="searchable-select">
-            <input type="text" id="arrival_time" name="arrival_time" placeholder="Начните вводить..." autocomplete="off">
-            <div class="searchable-dropdown" id="arrival_time_dropdown"></div>
-          </div>
-        </label>
-        <label>Прохождение Городецкого шлюза
-          <input type="datetime-local" name="gorodets_lock">
-        </label>
-      </div>
-    </div>
-  </div>
-
+  
 <!-- Карточка: Дополнительная информация -->
 <div class="card" style="margin-bottom: 20px;">
   <div class="card-header">📋 Дополнительная информация</div>
   <div class="card-body">
     <div class="form-grid">
-      
-      <!-- === СТРОКА 1: 3 колонки === -->
-      <label>Операции с ГСМ
+      <label>Проверка видеонаблюдения
         <div class="searchable-select">
-          <input type="text" id="fuel_operation" name="fuel_operation" placeholder="Начните вводить..." autocomplete="off">
-          <div class="searchable-dropdown" id="fuel_operation_dropdown"></div>
+          <input type="text" id="video_check" name="video_check" placeholder="Начните вводить..." autocomplete="off">
+          <div class="searchable-dropdown" id="video_check_dropdown"></div>
         </div>
       </label>
 
@@ -843,137 +983,24 @@
         </div>
       </label>
 
-      <label>Проверка видеонаблюдения
-        <div class="searchable-select">
-          <input type="text" id="video_check" name="video_check" placeholder="Начните вводить..." autocomplete="off">
-          <div class="searchable-dropdown" id="video_check_dropdown"></div>
-        </div>
-      </label>
-
-      <!-- === СКРЫТЫЕ БЛОКИ ГСМ (на всю ширину) === -->
-      <div id="bunkering_details" class="hidden" style="grid-column: 1 / -1;">
-        <div class="section-block">
-          <strong>Детали бункеровки</strong>
-          <div class="form-grid" style="margin-top: 15px;">
-            <label>Дата бункеровки 
-              <input type="datetime-local" name="bunkering_date">
-            </label>
-            <label>Поставщик ГСМ
-              <div class="searchable-select">
-                <input type="text" id="fuel_supplier" name="fuel_supplier" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="fuel_supplier_dropdown"></div>
-              </div>
-            </label>
-            <label>Номер заявки на топливо 
-              <input type="text" name="fuel_request_number" inputmode="numeric">
-            </label>
-            <label>Место бункеровки
-              <div class="searchable-select">
-                <input type="text" id="bunkering_place" name="bunkering_place" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="bunkering_place_dropdown"></div>
-              </div>
-            </label>
-            <label>Бункеровщик
-              <div class="searchable-select">
-                <input type="text" id="bunkerer" name="bunkerer" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="bunkerer_dropdown"></div>
-              </div>
-            </label>
-            <label>Получено ДТ, тн 
-              <input type="text" name="fuel_received_dt" inputmode="decimal">
-            </label>
-            <label>Получено ДМ, тн 
-              <input type="text" name="fuel_received_dm" inputmode="decimal">
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div id="transfer_details" class="hidden" style="grid-column: 1 / -1;">
-        <div class="section-block stern">
-          <strong>Детали перекачки</strong>
-          <div class="form-grid" style="margin-top: 15px;">
-            <label>Дата перекачки 
-              <input type="datetime-local" name="transfer_date">
-            </label>
-            <label>Место перекачки
-              <div class="searchable-select">
-                <input type="text" id="transfer_place" name="transfer_place" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="transfer_place_dropdown"></div>
-              </div>
-            </label>
-            <label>ГСМ
-              <div class="searchable-select">
-                <input type="text" id="fuel_type" name="fuel_type" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="fuel_type_dropdown"></div>
-              </div>
-            </label>
-            <label>Судно
-              <div class="searchable-select">
-                <input type="text" id="fuel_ship" name="fuel_ship" placeholder="Начните вводить..." autocomplete="off">
-                <div class="searchable-dropdown" id="fuel_ship_dropdown"></div>
-              </div>
-            </label>
-            <label>Перекачено ДТ, тн 
-              <input type="text" name="fuel_transferred_dt" inputmode="decimal">
-            </label>
-            <label>Перекачено ДМ, тн 
-              <input type="text" name="fuel_transferred_dm" inputmode="decimal">
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- === СТРОКА 2: Транспортное происшествие (1 колонка) + Горящие вопросы (2 колонки) === -->
-      <label>Вид транспортного происшествия
-        <div class="searchable-select">
-          <input type="text" id="accident_type" name="accident_type" placeholder="Начните вводить..." autocomplete="off">
-          <div class="searchable-dropdown" id="accident_type_dropdown"></div>
-        </div>
-      </label>
-
-      <label style="grid-column: span 2;">Горящие вопросы
-        <textarea name="burning_questions" rows="2" placeholder="Есть ли вопросы?"></textarea>
-      </label>
-
-      <!-- === СКРЫТЫЕ БЛОКИ ПРОИСШЕСТВИЯ И ПРОБЫ (на всю ширину) === -->
-      <div id="accident_details" class="hidden" style="grid-column: 1 / -1;">
-        <div class="section-block">
-          <strong>Детали происшествия</strong>
-          <div class="form-grid" style="margin-top: 15px;">
-            <label>С кем произошло 
-              <input type="text" name="accident_with" placeholder="Название судна/объекта">
-            </label>
-            <label>Местоположение происшествия 
-              <input type="text" name="accident_location" placeholder="Где произошло">
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <label style="grid-column: 1 / -1;">Описание ремонтных работ
-        <textarea name="repair_description" rows="3" placeholder="Опишите ремонт..."></textarea>
-      </label>
-
       <div id="sample_details" class="hidden" style="grid-column: 1 / -1;">
         <div class="section-block stern">
           <strong>Детали пробы</strong>
           <div class="form-grid" style="margin-top: 15px;">
-            <label>Дата передачи пробы 
-              <input type="datetime-local" name="sample_date">
-            </label>
-            <label>Номер пробы 
-              <input type="text" name="sample_number" inputmode="numeric">
-            </label>
-            <label>ФИО сдавшего от судна 
-              <input type="text" name="sample_given_by">
-            </label>
-            <label>ФИО принявшего от компании 
-              <input type="text" name="sample_received_by">
-            </label>
+            <label>Дата передачи пробы <input type="datetime-local" name="sample_date"></label>
+            <label>Номер пробы <input type="text" name="sample_number" inputmode="numeric"></label>
+            <label>ФИО сдавшего от судна <input type="text" name="sample_given_by"></label>
+            <label>ФИО принявшего от компании <input type="text" name="sample_received_by"></label>
           </div>
         </div>
       </div>
+
+      <label style="grid-column: 1 / -1;">Горящие вопросы
+        <textarea name="burning_questions" rows="2" placeholder="Есть ли вопросы?"></textarea>
+      </label>
+    </div>
+  </div>
+</div>
 
     </div>
   </div>
@@ -1195,7 +1222,11 @@
       initSearchableSelect('arrival_time', 'arrival_time_dropdown', appData.arrival_time || []);
       initSearchableSelect('queue_info', 'queue_info_dropdown', appData.queue_info || []);
       initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
+      initSearchableSelect('queue_info', 'queue_info_dropdown', appData.queue_info || []);
+      initSearchableSelect('fuel_operation', 'fuel_operation_dropdown', appData.fuel_operations || []);
+      initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
       initSearchableSelect('sample', 'sample_dropdown', appData.sample || []);
+      
 
       setupConditionalLogic();
     }
@@ -1208,32 +1239,46 @@ function setupConditionalLogic() {
   }
   
   // Вспомогательная функция для безопасного скрытия элемента
+function setupConditionalLogic() {
+  function safeClearValue(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) el.value = '';
+  }
   function safeHide(elementId) {
     const el = document.getElementById(elementId);
     if (el) el.classList.add('hidden');
   }
-  
-  // Вспомогательная функция для безопасного показа элемента
   function safeShow(elementId) {
     const el = document.getElementById(elementId);
     if (el) el.classList.remove('hidden');
   }
+  function resetWeatherCheckboxes() {
+    document.querySelectorAll('input[name="weather_conditions"]').forEach(cb => cb.checked = false);
+    safeClearValue('weather_other');
+    safeHide('weather_other_block');
+  }
 
-  // === 1. СТАТУС СУДНА → управление всей логикой ===
+  // 1. СТАТУС СУДНА
   document.getElementById('status').addEventListener('input', function() {
     const val = this.value;
     const isVReyse = val.toLowerCase().includes('в рейсе');
     const isPribyli = val.toLowerCase().includes('прибыли');
     
-    // Скрываем всё сначала
     safeHide('ship_condition_wrapper');
     safeHide('in_transit_block');
     safeHide('stop_block');
     safeHide('loading_block');
     safeHide('queue_block');
     safeHide('fleet_block');
+    safeHide('weather_block');
+    safeHide('fuel_stop_block');
+    safeHide('bunkering_details');
+    safeHide('transfer_details');
+    safeHide('repair_block');
+    safeHide('accident_stop_block');
+    safeHide('accident_ship_block');
+    safeHide('accident_other_block');
     
-    // Очищаем зависимые поля
     safeClearValue('ship_condition');
     safeClearValue('arrival_time');
     safeClearValue('queue_info');
@@ -1244,6 +1289,16 @@ function setupConditionalLogic() {
     safeClearValue('arrival_estimate');
     safeClearValue('loading_works');
     safeClearValue('ship_positioning');
+    safeClearValue('notice_arrival');
+    safeClearValue('loading_start');
+    safeClearValue('loading_end');
+    safeClearValue('gorodets_lock');
+    safeClearValue('fuel_operation');
+    safeClearValue('accident_type');
+    safeClearValue('accident_with');
+    safeClearValue('accident_other');
+    safeClearValue('repair_description');
+    resetWeatherCheckboxes();
     
     if (isVReyse) {
       safeShow('ship_condition_wrapper');
@@ -1252,7 +1307,7 @@ function setupConditionalLogic() {
     }
   });
 
-  // === 2. СОСТОЯНИЕ СУДНА (только для "В рейсе") ===
+  // 2. СОСТОЯНИЕ СУДНА
   document.getElementById('ship_condition').addEventListener('input', function() {
     const val = this.value;
     const isVHodu = val.toLowerCase().includes('в ходу');
@@ -1262,6 +1317,14 @@ function setupConditionalLogic() {
     safeHide('stop_block');
     safeHide('queue_block');
     safeHide('fleet_block');
+    safeHide('weather_block');
+    safeHide('fuel_stop_block');
+    safeHide('bunkering_details');
+    safeHide('transfer_details');
+    safeHide('repair_block');
+    safeHide('accident_stop_block');
+    safeHide('accident_ship_block');
+    safeHide('accident_other_block');
     
     safeClearValue('arrival_time');
     safeClearValue('queue_info');
@@ -1270,26 +1333,24 @@ function setupConditionalLogic() {
     safeClearValue('stop_datetime');
     safeClearValue('movement_estimate_start');
     safeClearValue('arrival_estimate');
+    safeClearValue('fuel_operation');
+    safeClearValue('accident_type');
+    safeClearValue('accident_with');
+    safeClearValue('accident_other');
+    safeClearValue('repair_description');
+    resetWeatherCheckboxes();
     
-    if (isVHodu) {
-      safeShow('in_transit_block');
-    } else if (isOstanovka) {
-      safeShow('stop_block');
-    }
+    if (isVHodu) safeShow('in_transit_block');
+    else if (isOstanovka) safeShow('stop_block');
   });
 
-  // === 3. ДО ПРИБЫТИЯ ОСТАЛОСЬ → очередь ===
+  // 3. ДО ПРИБЫТИЯ ОСТАЛОСЬ → очередь
   const arrivalTimeInput = document.getElementById('arrival_time');
   if (arrivalTimeInput) {
     arrivalTimeInput.addEventListener('input', function() {
-      const val = this.value.toLowerCase();
-      const isMenee24 = val.includes('менее');
-      
+      const isMenee24 = this.value.toLowerCase().includes('менее');
       const queueBlock = document.getElementById('queue_block');
-      if (queueBlock) {
-        queueBlock.classList.toggle('hidden', !isMenee24);
-      }
-      
+      if (queueBlock) queueBlock.classList.toggle('hidden', !isMenee24);
       if (!isMenee24) {
         safeClearValue('queue_info');
         safeClearValue('fleet_name');
@@ -1298,25 +1359,85 @@ function setupConditionalLogic() {
     });
   }
 
-  // === 4. ОЧЕРЕДЬ → название флота ===
+  // 4. ОЧЕРЕДЬ → название флота
   const queueInfoInput = document.getElementById('queue_info');
   if (queueInfoInput) {
     queueInfoInput.addEventListener('input', function() {
-      const val = this.value;
-      const isOchered = val === 'Очередь';
-      
+      const isOchered = this.value === 'Очередь';
       const fleetBlock = document.getElementById('fleet_block');
-      if (fleetBlock) {
-        fleetBlock.classList.toggle('hidden', !isOchered);
-      }
-      
-      if (!isOchered) {
-        safeClearValue('fleet_name');
-      }
+      if (fleetBlock) fleetBlock.classList.toggle('hidden', !isOchered);
+      if (!isOchered) safeClearValue('fleet_name');
     });
   }
 
-  // === 5. ПОГРУЗО-РАЗГРУЗОЧНЫЕ РАБОТЫ → причина простоя ===
+  // 5. ПРИЧИНА ОСТАНОВКИ → подблоки
+  const stopCauseInput = document.getElementById('stop_cause');
+  if (stopCauseInput) {
+    stopCauseInput.addEventListener('input', function() {
+      const val = this.value.toLowerCase();
+      
+      safeHide('weather_block');
+      safeHide('fuel_stop_block');
+      safeHide('bunkering_details');
+      safeHide('transfer_details');
+      safeHide('repair_block');
+      safeHide('accident_stop_block');
+      safeHide('accident_ship_block');
+      safeHide('accident_other_block');
+      
+      safeClearValue('fuel_operation');
+      safeClearValue('accident_type');
+      safeClearValue('accident_with');
+      safeClearValue('accident_other');
+      safeClearValue('repair_description');
+      resetWeatherCheckboxes();
+      
+      if (val.includes('погод')) safeShow('weather_block');
+      else if (val.includes('бункер')) safeShow('fuel_stop_block');
+      else if (val.includes('ремонт')) safeShow('repair_block');
+      else if (val.includes('происшеств') || val.includes('транспорт')) safeShow('accident_stop_block');
+    });
+  }
+
+  // 6. ВИД ОПЕРАЦИИ (бункеровка/перекачка)
+  const fuelOpInput = document.getElementById('fuel_operation');
+  if (fuelOpInput) {
+    fuelOpInput.addEventListener('input', function() {
+      const val = this.value.toLowerCase();
+      const bunkDetails = document.getElementById('bunkering_details');
+      const transDetails = document.getElementById('transfer_details');
+      if (bunkDetails) bunkDetails.classList.toggle('hidden', !val.includes('бункер'));
+      if (transDetails) transDetails.classList.toggle('hidden', !val.includes('перекач'));
+    });
+  }
+
+  // 7. ВИД ТРАНСПОРТНОГО ПРОИСШЕСТВИЯ
+  const accidentTypeInput = document.getElementById('accident_type');
+  if (accidentTypeInput) {
+    accidentTypeInput.addEventListener('input', function() {
+      const val = this.value.toLowerCase();
+      const shipBlock = document.getElementById('accident_ship_block');
+      const otherBlock = document.getElementById('accident_other_block');
+      
+      if (shipBlock) shipBlock.classList.toggle('hidden', !(val.includes('навал') || val.includes('столкнов')));
+      if (otherBlock) otherBlock.classList.toggle('hidden', !val.includes('другое'));
+      
+      if (!(val.includes('навал') || val.includes('столкнов'))) safeClearValue('accident_with');
+      if (!val.includes('другое')) safeClearValue('accident_other');
+    });
+  }
+
+  // 8. ЧЕКБОКС "ДРУГОЕ" В ПОГОДЕ
+  const weatherOtherCheckbox = document.getElementById('weather_other_checkbox');
+  if (weatherOtherCheckbox) {
+    weatherOtherCheckbox.addEventListener('change', function() {
+      const otherBlock = document.getElementById('weather_other_block');
+      if (otherBlock) otherBlock.classList.toggle('hidden', !this.checked);
+      if (!this.checked) safeClearValue('weather_other');
+    });
+  }
+
+  // 9. ПРР → причина простоя
   const loadingWorksInput = document.getElementById('loading_works');
   if (loadingWorksInput) {
     loadingWorksInput.addEventListener('input', function() {
@@ -1333,50 +1454,18 @@ function setupConditionalLogic() {
     });
   }
 
-  // === 6. ТРАНСПОРТНОЕ ПРОИСШЕСТВИЕ → детали ===
-  const accidentTypeInput = document.getElementById('accident_type');
-  if (accidentTypeInput) {
-    accidentTypeInput.addEventListener('input', function() {
-      const accidentDetails = document.getElementById('accident_details');
-      if (accidentDetails) {
-        accidentDetails.classList.toggle('hidden', !this.value);
-      }
-    });
-  }
-
-  // === 7. ПРОБА → детали пробы ===
+  // 10. ПРОБА → детали
   const sampleInput = document.getElementById('sample');
   if (sampleInput) {
     sampleInput.addEventListener('input', function() {
       const val = this.value.toLowerCase();
       const showDetails = val.includes('передава') && !val.includes('не ');
-      
       const sampleDetails = document.getElementById('sample_details');
-      if (sampleDetails) {
-        sampleDetails.classList.toggle('hidden', !showDetails);
-      }
+      if (sampleDetails) sampleDetails.classList.toggle('hidden', !showDetails);
     });
   }
 
-  // === 8. ОПЕРАЦИИ С ГСМ → бункеровка/перекачка ===
-  const fuelOperationInput = document.getElementById('fuel_operation');
-  if (fuelOperationInput) {
-    fuelOperationInput.addEventListener('input', function() {
-      const val = this.value.toLowerCase();
-      
-      const bunkeringDetails = document.getElementById('bunkering_details');
-      if (bunkeringDetails) {
-        bunkeringDetails.classList.toggle('hidden', !val.includes('бункер'));
-      }
-      
-      const transferDetails = document.getElementById('transfer_details');
-      if (transferDetails) {
-        transferDetails.classList.toggle('hidden', !val.includes('перекач'));
-      }
-    });
-  }
-
-  // === 9. БАССЕЙН → ОРИЕНТИР ===
+  // 11. БАССЕЙН → ОРИЕНТИР
   const basinInput = document.getElementById('basin');
   if (basinInput) {
     basinInput.addEventListener('input', function() {
@@ -1390,11 +1479,9 @@ function setupConditionalLogic() {
           locationInput.disabled = false;
           locationInput.placeholder = 'Начните вводить...';
           locationInput.value = '';
-          
           delete locationInput.dataset.searchableInit;
           locationDropdown.innerHTML = '';
           locationDropdown.classList.remove('show');
-          
           setTimeout(() => {
             initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
           }, 100);
@@ -1512,6 +1599,9 @@ function setupConditionalLogic() {
       }
 
 const fd = new FormData(form);
+const fd = new FormData(form);
+
+// 1. Сначала создаём базовый объект data
 const data = {
   id: Date.now().toString(36) + Math.random().toString(36).substr(2),
   timestamp: Date.now(),
@@ -1566,11 +1656,31 @@ const data = {
   burning_questions: fd.get('burning_questions'),
   arrival_estimate: fd.get('arrival_estimate'),
   fleet_name: fd.get('fleet_name'),
-  
   queue_info: fd.get('queue_info'),
   stop_datetime: fd.get('stop_datetime'),
   movement_estimate_start: fd.get('movement_estimate_start')
 };
+
+// 2. ПОСЛЕ закрытия объекта — обрабатываем чекбоксы погоды
+const weatherChecks = Array.from(document.querySelectorAll('input[name="weather_conditions"]:checked')).map(cb => cb.value);
+const weatherOther = fd.get('weather_other') || '';
+
+let weatherValue = weatherChecks.join(', ');
+if (weatherOther) {
+  weatherValue = weatherValue ? weatherValue + ', другое: ' + weatherOther : 'другое: ' + weatherOther;
+}
+data.weather = weatherValue;
+
+// 3. Обрабатываем "другое" для транспортного происшествия
+const accidentType = fd.get('accident_type') || '';
+const accidentOther = fd.get('accident_other') || '';
+if (accidentType.toLowerCase() === 'другое' && accidentOther) {
+  data.accident_type = 'другое: ' + accidentOther;
+} else {
+  data.accident_type = accidentType;
+}
+
+data.accident_with = fd.get('accident_with') || '';
 
       if (data.ship_type === 'tug') {
         data.cargo_type_bow = fd.get('cargo_type_bow'); data.cargo_type_stern = fd.get('cargo_type_stern');
