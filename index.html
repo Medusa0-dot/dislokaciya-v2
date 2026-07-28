@@ -1124,28 +1124,28 @@ input[type="checkbox"]:hover {
     }
 
     // === АВТОРИЗАЦИЯ ===
-    function tryLogin() {
-      const pin = document.getElementById('pin_input').value.trim();
-      if (pin.length !== 4) {
-        toast('❌ PIN должен состоять из 4 цифр');
-        return;
-      }
+function tryLogin() {
+  const pin = document.getElementById('pin_input').value.trim();
+  if (pin.length !== 4) {
+    toast(' PIN должен состоять из 4 цифр');
+    return;
+  }
 
-      const found = appData.ship_pins && appData.ship_pins[pin];
-      if (found) {
-        currentShip = found;
-        localStorage.setItem(PIN_STORAGE_KEY, pin);
-        document.getElementById('login_screen').classList.add('hidden');
-        document.getElementById('main_form').classList.remove('hidden');
-        document.getElementById('ship_name_display').textContent = found.ship;
-        document.getElementById('captain_display').value = found.captains[0] || 'Капитан';
-        
-        setupFormForShip(found.ship_type || 'self');
-        toast(`✅ Добро пожаловать, ${found.ship}`);
-      } else {
-        toast(' Неверный PIN-код');
-      }
-    }
+  const found = appData.ship_pins && appData.ship_pins[pin];
+  if (found) {
+    currentShip = found;
+    localStorage.setItem(PIN_STORAGE_KEY, pin);
+    document.getElementById('login_screen').classList.add('hidden');
+    document.getElementById('main_form').classList.remove('hidden');
+    document.getElementById('ship_name_display').textContent = found.ship;
+    document.getElementById('captain_display').value = found.captains[0] || 'Капитан';
+    
+    setupFormForShip(found.ship_type || 'self');
+    toast(`✅ Добро пожаловать, ${found.ship}`);
+  } else {
+    toast('❌ Неверный PIN-код');
+  }
+}
 
     function logout() {
       localStorage.removeItem(PIN_STORAGE_KEY);
@@ -1218,27 +1218,16 @@ input[type="checkbox"]:hover {
       initSearchableSelect('bunkering_place', 'bunkering_place_dropdown', bunkeringPlaces);
       initSearchableSelect('transfer_place', 'transfer_place_dropdown', appData.transfer_places || []);
       
-      initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
       initSearchableSelect('arrival_time', 'arrival_time_dropdown', appData.arrival_time || []);
-      initSearchableSelect('queue_info', 'queue_info_dropdown', appData.queue_info || []);
-      initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
       initSearchableSelect('queue_info', 'queue_info_dropdown', appData.queue_info || []);
       initSearchableSelect('fuel_operation', 'fuel_operation_dropdown', appData.fuel_operations || []);
       initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
+      initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
       initSearchableSelect('sample', 'sample_dropdown', appData.sample || []);
-      
 
       setupConditionalLogic();
     }
 
-function setupConditionalLogic() {
-  // Вспомогательная функция для безопасной очистки поля
-  function safeClearValue(elementId) {
-    const el = document.getElementById(elementId);
-    if (el) el.value = '';
-  }
-  
-  // Вспомогательная функция для безопасного скрытия элемента
 function setupConditionalLogic() {
   function safeClearValue(elementId) {
     const el = document.getElementById(elementId);
@@ -1300,11 +1289,8 @@ function setupConditionalLogic() {
     safeClearValue('repair_description');
     resetWeatherCheckboxes();
     
-    if (isVReyse) {
-      safeShow('ship_condition_wrapper');
-    } else if (isPribyli) {
-      safeShow('loading_block');
-    }
+    if (isVReyse) safeShow('ship_condition_wrapper');
+    else if (isPribyli) safeShow('loading_block');
   });
 
   // 2. СОСТОЯНИЕ СУДНА
@@ -1375,7 +1361,6 @@ function setupConditionalLogic() {
   if (stopCauseInput) {
     stopCauseInput.addEventListener('input', function() {
       const val = this.value.toLowerCase();
-      
       safeHide('weather_block');
       safeHide('fuel_stop_block');
       safeHide('bunkering_details');
