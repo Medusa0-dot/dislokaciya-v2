@@ -696,44 +696,101 @@
 
 <!-- Карточка: Состояние судна -->
 <div class="card" style="margin-bottom: 20px;">
-  <div class="card-header"> Состояние судна</div>
+  <div class="card-header">⚓ Состояние судна</div>
   <div class="card-body">
-    <div class="form-grid" style="margin-top: 0;">
-      <label>Состояние судна
-        <div class="searchable-select">
-          <input type="text" id="ship_condition" name="ship_condition" placeholder="— Выберите состояние —" required autocomplete="off">
-          <div class="searchable-dropdown" id="ship_condition_dropdown"></div>
-        </div>
-      </label>
+    <div class="form-grid">
       
-      <div id="stop_cause_section" class="hidden">
-        <label>Причина остановки
+      <!-- Состояние судна (показывается только если статус = "В рейсе") -->
+      <div id="ship_condition_wrapper" class="hidden" style="grid-column: 1 / -1;">
+        <label>Состояние судна
           <div class="searchable-select">
-            <input type="text" id="stop_cause" name="stop_cause" placeholder="Начните вводить..." autocomplete="off">
-            <div class="searchable-dropdown" id="stop_cause_dropdown"></div>
+            <input type="text" id="ship_condition" name="ship_condition" placeholder="— Выберите состояние —" autocomplete="off">
+            <div class="searchable-dropdown" id="ship_condition_dropdown"></div>
           </div>
         </label>
       </div>
 
-      <label>Погрузо-разгрузочные работы
-        <div class="searchable-select">
-          <input type="text" id="loading_works" name="loading_works" placeholder="Начните вводить..." autocomplete="off">
-          <div class="searchable-dropdown" id="loading_works_dropdown"></div>
+      <!-- === БЛОК: В ХОДУ === -->
+      <div id="in_transit_block" class="hidden" style="grid-column: 1 / -1;">
+        <div class="section-block">
+          <strong>Судно в ходу</strong>
+          <div class="form-grid" style="margin-top: 15px;">
+            <label>Ориентировочное прибытие на погрузку/выгрузку
+              <input type="datetime-local" name="arrival_estimate">
+            </label>
+            <label>До прибытия на грузовые операции осталось
+              <div class="searchable-select">
+                <input type="text" id="arrival_time" name="arrival_time" placeholder="— Выберите —" autocomplete="off">
+                <div class="searchable-dropdown" id="arrival_time_dropdown"></div>
+              </div>
+            </label>
+          </div>
+          
+          <!-- Очередь (показывается если "менее 24 часов") -->
+          <div id="queue_block" class="hidden" style="margin-top: 15px;">
+            <div class="form-grid">
+              <label>Очередь на грузовых операциях
+                <div class="searchable-select">
+                  <input type="text" id="queue_info" name="queue_info" placeholder="— Выберите —" autocomplete="off">
+                  <div class="searchable-dropdown" id="queue_info_dropdown"></div>
+                </div>
+              </label>
+              
+              <!-- Название флота (показывается если "Очередь") -->
+              <div id="fleet_block" class="hidden">
+                <label>Название флота в очереди
+                  <input type="text" name="fleet_name" placeholder="Введите название флота">
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
-      </label>
+      </div>
 
-      <div id="stop_reason_section" class="hidden">
-        <label>Причина простоя на грузовых операциях
-          <input type="text" name="stop_reason" placeholder="Опишите причину...">
+      <!-- === БЛОК: ОСТАНОВКА СУДНА === -->
+      <div id="stop_block" class="hidden" style="grid-column: 1 / -1;">
+        <div class="section-block stern">
+          <strong>Остановка судна</strong>
+          <div class="form-grid" style="margin-top: 15px;">
+            <label>Причина остановки
+              <div class="searchable-select">
+                <input type="text" id="stop_cause" name="stop_cause" placeholder="— Выберите причину —" autocomplete="off">
+                <div class="searchable-dropdown" id="stop_cause_dropdown"></div>
+              </div>
+            </label>
+            <label>Дата и время остановки судна
+              <input type="datetime-local" name="stop_datetime">
+            </label>
+            <label>Ориентировочное начало движения
+              <input type="datetime-local" name="movement_estimate_start">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Погрузо-разгрузочные работы (показывается для статусов "Прибыли на...") -->
+      <div id="loading_block" class="hidden" style="grid-column: 1 / -1;">
+        <label>Погрузо-разгрузочные работы
+          <div class="searchable-select">
+            <input type="text" id="loading_works" name="loading_works" placeholder="— Выберите —" autocomplete="off">
+            <div class="searchable-dropdown" id="loading_works_dropdown"></div>
+          </div>
+        </label>
+
+        <div id="stop_reason_section" class="hidden">
+          <label>Причина простоя на грузовых операциях
+            <input type="text" name="stop_reason" placeholder="Опишите причину...">
+          </label>
+        </div>
+
+        <label>Постановка судна
+          <div class="searchable-select">
+            <input type="text" id="ship_positioning" name="ship_positioning" placeholder="— Выберите —" autocomplete="off">
+            <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
+          </div>
         </label>
       </div>
 
-      <label>Постановка судна
-        <div class="searchable-select">
-          <input type="text" id="ship_positioning" name="ship_positioning" placeholder="Начните вводить..." autocomplete="off">
-          <div class="searchable-dropdown" id="ship_positioning_dropdown"></div>
-        </div>
-      </label>
     </div>
   </div>
 </div>
@@ -1136,86 +1193,155 @@
       
       initSearchableSelect('accident_type', 'accident_type_dropdown', appData.accident_types || []);
       initSearchableSelect('arrival_time', 'arrival_time_dropdown', appData.arrival_time || []);
+      initSearchableSelect('queue_info', 'queue_info_dropdown', appData.queue_info || []);
       initSearchableSelect('video_check', 'video_check_dropdown', appData.video_check || []);
       initSearchableSelect('sample', 'sample_dropdown', appData.sample || []);
 
       setupConditionalLogic();
     }
 
-    function setupConditionalLogic() {
-      // Бассейн -> Ориентир
-      document.getElementById('basin').addEventListener('input', function() {
-        const basin = this.value;
-        const locationKey = getLocationKeyForBasin(basin);
-        const locationInput = document.getElementById('location');
-        const locationDropdown = document.getElementById('location_dropdown');
-        
-        console.log('Выбран бассейн:', basin, 'Ключ:', locationKey);
-        
-        if (locationKey && appData[locationKey] && appData[locationKey].length > 0) {
-          locationInput.disabled = false;
-          locationInput.placeholder = 'Начните вводить...';
-          locationInput.value = '';
-          
-          delete locationInput.dataset.searchableInit;
-          locationDropdown.innerHTML = '';
-          locationDropdown.classList.remove('show');
-          
-          setTimeout(() => {
-            initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
-            console.log('Ориентиры загружены:', appData[locationKey].length, 'штук');
-          }, 100);
-          
-        } else {
-          locationInput.value = '';
-          locationInput.disabled = true;
-          locationInput.placeholder = 'Сначала выберите бассейн';
-          locationDropdown.innerHTML = '';
-          locationDropdown.classList.remove('show');
-        }
-      });
-
-// Статус судна -> Причина остановки
-document.getElementById('status').addEventListener('input', function() {
-  const section = document.getElementById('stop_cause_section');
-  if (this.value.toLowerCase().includes('остановка')) {
-    section.classList.remove('hidden');
-  } else {
-    section.classList.add('hidden');
+function setupConditionalLogic() {
+  // === 1. СТАТУС СУДНА → управление всей логикой ===
+  document.getElementById('status').addEventListener('input', function() {
+    const val = this.value;
+    const isVReyse = val.toLowerCase().includes('в рейсе');
+    const isPribyli = val.toLowerCase().includes('прибыли');
+    
+    // Скрываем всё сначала
+    document.getElementById('ship_condition_wrapper').classList.add('hidden');
+    document.getElementById('in_transit_block').classList.add('hidden');
+    document.getElementById('stop_block').classList.add('hidden');
+    document.getElementById('loading_block').classList.add('hidden');
+    
+    // Очищаем зависимые поля
+    document.getElementById('ship_condition').value = '';
+    document.getElementById('arrival_time').value = '';
+    document.getElementById('queue_info').value = '';
+    document.getElementById('fleet_name').value = '';
     document.getElementById('stop_cause').value = '';
-  }
-});
-
-      // ПРР -> Причина простоя
-      document.getElementById('loading_works').addEventListener('input', function() {
-        const section = document.getElementById('stop_reason_section');
-        if (this.value.toLowerCase().includes('приостановили')) {
-          section.classList.remove('hidden');
-        } else {
-          section.classList.add('hidden');
-          document.querySelector('[name="stop_reason"]').value = '';
-        }
-      });
-
-      // Операции с ГСМ
-      document.getElementById('fuel_operation').addEventListener('input', function() {
-        const val = this.value.toLowerCase();
-        document.getElementById('bunkering_details').classList.toggle('hidden', !val.includes('бункер'));
-        document.getElementById('transfer_details').classList.toggle('hidden', !val.includes('перекач'));
-      });
-
-      // Происшествия
-      document.getElementById('accident_type').addEventListener('input', function() {
-        document.getElementById('accident_details').classList.toggle('hidden', !this.value);
-      });
-
-// Проба
-document.getElementById('sample').addEventListener('input', function() {
-  const val = this.value.toLowerCase();
-  const showDetails = val.includes('передава') && !val.includes('не ');
-  document.getElementById('sample_details').classList.toggle('hidden', !showDetails);
-});
+    document.getElementById('stop_datetime').value = '';
+    document.getElementById('movement_estimate_start').value = '';
+    document.getElementById('arrival_estimate').value = '';
+    
+    if (isVReyse) {
+      // Показываем "Состояние судна"
+      document.getElementById('ship_condition_wrapper').classList.remove('hidden');
+    } else if (isPribyli) {
+      // Показываем блок ПРР
+      document.getElementById('loading_block').classList.remove('hidden');
     }
+  });
+
+  // === 2. СОСТОЯНИЕ СУДНА (только для "В рейсе") ===
+  document.getElementById('ship_condition').addEventListener('input', function() {
+    const val = this.value;
+    const isVHodu = val.toLowerCase().includes('в ходу');
+    const isOstanovka = val.toLowerCase().includes('остановка');
+    
+    // Скрываем оба блока
+    document.getElementById('in_transit_block').classList.add('hidden');
+    document.getElementById('stop_block').classList.add('hidden');
+    
+    // Очищаем поля
+    document.getElementById('arrival_time').value = '';
+    document.getElementById('queue_info').value = '';
+    document.getElementById('fleet_name').value = '';
+    document.getElementById('stop_cause').value = '';
+    document.getElementById('stop_datetime').value = '';
+    document.getElementById('movement_estimate_start').value = '';
+    document.getElementById('arrival_estimate').value = '';
+    
+    if (isVHodu) {
+      document.getElementById('in_transit_block').classList.remove('hidden');
+    } else if (isOstanovka) {
+      document.getElementById('stop_block').classList.remove('hidden');
+    }
+  });
+
+  // === 3. ДО ПРИБЫТИЯ ОСТАЛОСЬ → очередь ===
+  document.getElementById('arrival_time').addEventListener('input', function() {
+    const val = this.value.toLowerCase();
+    const isMenee24 = val.includes('менее');
+    
+    document.getElementById('queue_block').classList.toggle('hidden', !isMenee24);
+    
+    // Очищаем очередь если скрыли
+    if (!isMenee24) {
+      document.getElementById('queue_info').value = '';
+      document.getElementById('fleet_name').value = '';
+      document.getElementById('fleet_block').classList.add('hidden');
+    }
+  });
+
+  // === 4. ОЧЕРЕДЬ → название флота ===
+  document.getElementById('queue_info').addEventListener('input', function() {
+    const val = this.value;
+    const isOchered = val === 'Очередь';
+    document.getElementById('fleet_block').classList.toggle('hidden', !isOchered);
+    
+    if (!isOchered) {
+      document.getElementById('fleet_name').value = '';
+    }
+  });
+
+  // === 5. ПОГРУЗО-РАЗГРУЗОЧНЫЕ РАБОТЫ → причина простоя ===
+  document.getElementById('loading_works').addEventListener('input', function() {
+    const section = document.getElementById('stop_reason_section');
+    if (this.value.toLowerCase().includes('приостановили')) {
+      section.classList.remove('hidden');
+    } else {
+      section.classList.add('hidden');
+      document.querySelector('[name="stop_reason"]').value = '';
+    }
+  });
+
+  // === 6. ТРАНСПОРТНОЕ ПРОИСШЕСТВИЕ → детали ===
+  document.getElementById('accident_type').addEventListener('input', function() {
+    document.getElementById('accident_details').classList.toggle('hidden', !this.value);
+  });
+
+  // === 7. ПРОБА → детали пробы ===
+  document.getElementById('sample').addEventListener('input', function() {
+    const val = this.value.toLowerCase();
+    const showDetails = val.includes('передава') && !val.includes('не ');
+    document.getElementById('sample_details').classList.toggle('hidden', !showDetails);
+  });
+
+  // === 8. ОПЕРАЦИИ С ГСМ → бункеровка/перекачка ===
+  document.getElementById('fuel_operation').addEventListener('input', function() {
+    const val = this.value.toLowerCase();
+    document.getElementById('bunkering_details').classList.toggle('hidden', !val.includes('бункер'));
+    document.getElementById('transfer_details').classList.toggle('hidden', !val.includes('перекач'));
+  });
+
+  // === 9. БАССЕЙН → ОРИЕНТИР ===
+  document.getElementById('basin').addEventListener('input', function() {
+    const basin = this.value;
+    const locationKey = getLocationKeyForBasin(basin);
+    const locationInput = document.getElementById('location');
+    const locationDropdown = document.getElementById('location_dropdown');
+    
+    if (locationKey && appData[locationKey] && appData[locationKey].length > 0) {
+      locationInput.disabled = false;
+      locationInput.placeholder = 'Начните вводить...';
+      locationInput.value = '';
+      
+      delete locationInput.dataset.searchableInit;
+      locationDropdown.innerHTML = '';
+      locationDropdown.classList.remove('show');
+      
+      setTimeout(() => {
+        initSearchableSelect('location', 'location_dropdown', appData[locationKey]);
+      }, 100);
+    } else {
+      locationInput.value = '';
+      locationInput.disabled = true;
+      locationInput.placeholder = 'Сначала выберите бассейн';
+      locationDropdown.innerHTML = '';
+      locationDropdown.classList.remove('show');
+    }
+  });
+}
 
     // === ПОИСК В ВЫПАДАЮЩИХ СПИСКАХ ===
     function initSearchableSelect(inputId, dropdownId, options) {
@@ -1318,35 +1444,66 @@ document.getElementById('sample').addEventListener('input', function() {
         return;
       }
 
-      const fd = new FormData(form);
-      const data = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-        timestamp: Date.now(),
-        ship_type: currentShip.ship_type || 'self',
-        ship_name: currentShip.ship,
-        captain: currentShip.captains[0] || '',
-        client: fd.get('client'), departure: fd.get('departure'), destination: fd.get('destination'),
-        basin: fd.get('basin'), location: fd.get('location'), weather: fd.get('weather'),
-        wind_classification: fd.get('wind_classification'), status: fd.get('status'),
-        ship_condition: fd.get('ship_condition'), loading_works: fd.get('loading_works'),
-        ship_positioning: fd.get('ship_positioning'), stop_reason: fd.get('stop_reason'),
-        stop_cause: fd.get('stop_cause'), notice_arrival: fd.get('notice_arrival'),
-        loading_start: fd.get('loading_start'), loading_end: fd.get('loading_end'),
-        arrival_time: fd.get('arrival_time'), gorodets_lock: fd.get('gorodets_lock'),
-        remain_dt: fd.get('remain_dt'), remain_dm: fd.get('remain_dm'), remain_oil_15w40: fd.get('remain_oil_15w40'),
-        fuel_operation: fd.get('fuel_operation'), bunkering_date: fd.get('bunkering_date'),
-        fuel_supplier: fd.get('fuel_supplier'), fuel_request_number: fd.get('fuel_request_number'),
-        bunkering_place: fd.get('bunkering_place'), bunkerer: fd.get('bunkerer'),
-        fuel_received_dt: fd.get('fuel_received_dt'), fuel_received_dm: fd.get('fuel_received_dm'),
-        transfer_date: fd.get('transfer_date'), transfer_place: fd.get('transfer_place'),
-        fuel_type: fd.get('fuel_type'), fuel_ship: fd.get('fuel_ship'),
-        fuel_transferred_dt: fd.get('fuel_transferred_dt'), fuel_transferred_dm: fd.get('fuel_transferred_dm'),
-        accident_type: fd.get('accident_type'), accident_with: fd.get('accident_with'),
-        accident_location: fd.get('accident_location'), repair_description: fd.get('repair_description'),
-        video_check: fd.get('video_check'), sample: fd.get('sample'), sample_date: fd.get('sample_date'),
-        sample_number: fd.get('sample_number'), sample_given_by: fd.get('sample_given_by'),
-        sample_received_by: fd.get('sample_received_by'), burning_questions: fd.get('burning_questions')
-      };
+const fd = new FormData(form);
+const data = {
+  id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+  timestamp: Date.now(),
+  ship_type: currentShip.ship_type || 'self',
+  ship_name: currentShip.ship,
+  captain: currentShip.captains[0] || '',
+  client: fd.get('client'), 
+  departure: fd.get('departure'), 
+  destination: fd.get('destination'),
+  basin: fd.get('basin'), 
+  location: fd.get('location'), 
+  weather: fd.get('weather'),
+  wind_classification: fd.get('wind_classification'), 
+  status: fd.get('status'),
+  ship_condition: fd.get('ship_condition'), 
+  loading_works: fd.get('loading_works'),
+  ship_positioning: fd.get('ship_positioning'), 
+  stop_reason: fd.get('stop_reason'),
+  stop_cause: fd.get('stop_cause'), 
+  notice_arrival: fd.get('notice_arrival'),
+  loading_start: fd.get('loading_start'), 
+  loading_end: fd.get('loading_end'),
+  arrival_time: fd.get('arrival_time'), 
+  gorodets_lock: fd.get('gorodets_lock'),
+  remain_dt: fd.get('remain_dt'), 
+  remain_dm: fd.get('remain_dm'), 
+  remain_oil_15w40: fd.get('remain_oil_15w40'),
+  fuel_operation: fd.get('fuel_operation'), 
+  bunkering_date: fd.get('bunkering_date'),
+  fuel_supplier: fd.get('fuel_supplier'), 
+  fuel_request_number: fd.get('fuel_request_number'),
+  bunkering_place: fd.get('bunkering_place'), 
+  bunkerer: fd.get('bunkerer'),
+  fuel_received_dt: fd.get('fuel_received_dt'), 
+  fuel_received_dm: fd.get('fuel_received_dm'),
+  transfer_date: fd.get('transfer_date'), 
+  transfer_place: fd.get('transfer_place'),
+  fuel_type: fd.get('fuel_type'), 
+  fuel_ship: fd.get('fuel_ship'),
+  fuel_transferred_dt: fd.get('fuel_transferred_dt'), 
+  fuel_transferred_dm: fd.get('fuel_transferred_dm'),
+  accident_type: fd.get('accident_type'), 
+  accident_with: fd.get('accident_with'),
+  accident_location: fd.get('accident_location'), 
+  repair_description: fd.get('repair_description'),
+  video_check: fd.get('video_check'), 
+  sample: fd.get('sample'), 
+  sample_date: fd.get('sample_date'),
+  sample_number: fd.get('sample_number'), 
+  sample_given_by: fd.get('sample_given_by'),
+  sample_received_by: fd.get('sample_received_by'), 
+  burning_questions: fd.get('burning_questions'),
+  arrival_estimate: fd.get('arrival_estimate'),
+  fleet_name: fd.get('fleet_name'),
+  
+  queue_info: fd.get('queue_info'),
+  stop_datetime: fd.get('stop_datetime'),
+  movement_estimate_start: fd.get('movement_estimate_start')
+};
 
       if (data.ship_type === 'tug') {
         data.cargo_type_bow = fd.get('cargo_type_bow'); data.cargo_type_stern = fd.get('cargo_type_stern');
