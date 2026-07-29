@@ -1122,22 +1122,31 @@ input[type="checkbox"]:hover {
     // === АВТОРИЗАЦИЯ ===
 function tryLogin() {
   const pin = document.getElementById('pin_input').value.trim();
+  
   if (pin.length !== 4) {
-    toast(' PIN должен состоять из 4 цифр');
+    toast('❌ PIN должен состоять из 4 цифр');
     return;
   }
 
-  const found = appData.ship_pins && appData.ship_pins[pin];
+  const data = loadData();
+  const found = data.ship_pins && data.ship_pins[pin];
+  
   if (found) {
     currentShip = found;
     localStorage.setItem(PIN_STORAGE_KEY, pin);
+    
+    // Скрываем вход, показываем форму (адаптировано под текущий HTML)
     document.getElementById('login_screen').classList.add('hidden');
     document.getElementById('main_form').classList.remove('hidden');
+    
+    // Заполняем карточку судна
     document.getElementById('ship_name_display').textContent = found.ship;
     document.getElementById('captain_display').value = found.captains[0] || 'Капитан';
     
+    // Настраиваем форму под тип судна (самоход/буксир)
     setupFormForShip(found.ship_type || 'self');
-    toast(`✅ Добро пожаловать, ${found.ship}`);
+    
+    toast('✅ Вход: ' + found.ship);
   } else {
     toast('❌ Неверный PIN-код');
   }
