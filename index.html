@@ -543,23 +543,27 @@ input[type="checkbox"]:hover {
   <div id="toast" class="toast"></div>
 
   <div class="container">
+
     <!-- ЭКРАН ВХОДА -->
-    <div id="login_screen" class="card text-center" style="max-width: 500px; margin: 50px auto; padding: 40px;">
-      <img src="logo.png" alt="Логотип" style="width: 100px; margin-bottom: 20px;">
-      <h2 style="margin-bottom: 10px; color: var(--primary);">Вход в систему</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 30px;">Введите PIN-код для авторизации</p>
-      
-      <label style="text-align: left;">
-        PIN-код (последние 4 цифры рабочего номера)
-        <input type="password" id="pin_input" inputmode="numeric" pattern="[0-9]*" maxlength="4" 
-       placeholder="****" 
-       style="letter-spacing: 5px; font-size: 1.2em; text-align: center;"
-       onkeypress="if(event.key === 'Enter') { event.preventDefault(); tryLogin(); }">
-      </label>
-      
-      <button class="btn" onclick="tryLogin()">Войти</button>
-      <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: 20px;">Если забыли PIN, обратитесь к диспетчеру</p>
-    </div>
+<div id="login_screen" class="card text-center" style="max-width: 500px; margin: 50px auto; padding: 40px;">
+  <img src="logo.png" alt="Логотип" style="width: 100px; margin-bottom: 20px;">
+  <h2 style="margin-bottom: 10px; color: var(--primary);">Вход в систему</h2>
+  <p style="color: var(--text-secondary); margin-bottom: 30px;">Введите PIN-код для авторизации</p>
+  
+  <form id="login_form" onsubmit="event.preventDefault(); tryLogin();">
+    <label style="text-align: left;">
+      PIN-код (последние 4 цифры рабочего номера)
+      <input type="password" id="pin_input" inputmode="numeric" pattern="[0-9]*" maxlength="4" 
+             placeholder="****" 
+             style="letter-spacing: 5px; font-size: 1.2em; text-align: center;"
+             required>
+    </label>
+    
+    <button type="submit" class="btn">Войти</button>
+  </form>
+  
+  <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: 20px;">Если забыли PIN, обратитесь к диспетчеру</p>
+</div>
 
     <!-- ОСНОВНАЯ ФОРМА -->
     <div id="main_form" class="hidden">
