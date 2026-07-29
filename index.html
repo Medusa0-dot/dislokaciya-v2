@@ -570,8 +570,10 @@ input[type="checkbox"]:hover {
       <!-- Карточка судна -->
       <div class="ship-card">
         <div class="ship-name" id="ship_name_display">—</div>
-        <label class="captain-label">Капитан</label>
-        <input type="text" id="captain_display" readonly style="background: var(--bg-color); text-align: center;">
+<label class="captain-label">Капитан</label>
+<select id="captain_display" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text-color);">
+  <option value="">— Выберите капитана —</option>
+</select>
       </div>
 
 <form id="dislocation_form">
@@ -1123,37 +1125,68 @@ input[type="checkbox"]:hover {
     }
 
     // === АВТОРИЗАЦИЯ ПО PIN ===
-    function tryLogin() {
-      const pin = document.getElementById('pin_input').value.trim();
-      
-      if (pin.length !== 4) {
-        toast('❌ PIN должен состоять из 4 цифр');
-        return;
-      }
+function tryLogin() {
+  const pin = document.getElementById('pin_input').value.trim();
+  
+  console.log('🔑 Попытка входа с PIN:', pin);
+  
+  if (pin.length !== 4 && pin.length !== 3) {
+    toast('❌ PIN должен состоять из 3 или 4 цифр');
+    return;
+  }
 
-      const data = loadData();
-      const found = data.ship_pins && data.ship_pins[pin];
+  // Добавляем 0 в начало для 3-значных PIN
+  let pinToCheck = pin;
+  if (pin.length === 3) {
+    pinToCheck = '0' + pin;
+    console.log('🔄 Преобразован в 4-значный:', pinToCheck);
+  }
+
+  const data = loadData();
+  console.log('🔍 Доступные PIN-коды:', Object.keys(data.ship_pins || {}));
+  
+  const found = data.ship_pins && data.ship_pins[pinToCheck];
+  
+  if (found) {
+    console.log('✅ Найдено судно:', found);
+    currentShip = found;
+    localStorage.setItem(PIN_STORAGE_KEY, pinToCheck);
+    
+    // Скрываем вход, показываем форму
+    document.getElementById('login_screen').classList.add('hidden');
+    document.getElementById('main_form').classList.remove('hidden');
+    
+    // Заполняем карточку судна
+    document.getElementById('ship_name_display').textContent = found.ship;
+    document.getElementById('captain_display').value = found.captains[0] || 'Капитан';
+    
+    // ✅ НОВОЕ: Заполняем выпадающий список капитанов
+    const captainSelect = document.getElementById('captain_display');
+    if (captainSelect && found.captains && found.captains.length > 0) {
+      // Очищаем список
+      captainSelect.innerHTML = '';
       
-      if (found) {
-        currentShip = found;
-        localStorage.setItem(PIN_STORAGE_KEY, pin);
-        
-        // Скрываем вход, показываем форму
-        document.getElementById('login_screen').classList.add('hidden');
-        document.getElementById('main_form').classList.remove('hidden');
-        
-        // Заполняем карточку судна
-        document.getElementById('ship_name_display').textContent = found.ship;
-        document.getElementById('captain_display').value = found.captains[0] || 'Капитан';
-        
-        // Настраиваем форму под тип судна
-        setupFormForShip(found.ship_type || 'self');
-        
-        toast('✅ Вход выполнен: ' + found.ship);
-      } else {
-        toast('❌ Неверный PIN-код');
-      }
+      // Добавляем опции
+      found.captains.forEach(captain => {
+        const option = document.createElement('option');
+        option.value = captain;
+        option.textContent = captain;
+        captainSelect.appendChild(option);
+      });
+      
+      // Выбираем первого капитана по умолчанию
+      captainSelect.value = found.captains[0];
     }
+    
+    // Настраиваем форму под тип судна
+    setupFormForShip(found.ship_type || 'self');
+    
+    toast('✅ Вход выполнен: ' + found.ship);
+  } else {
+    console.log('❌ PIN не найден в списке');
+    toast('❌ Неверный PIN-код');
+  }
+}
 
     // === ВЫХОД ===
     function logout() {
