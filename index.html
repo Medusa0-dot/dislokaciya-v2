@@ -1125,7 +1125,7 @@ input[type="checkbox"]:hover {
     }
 
     // === АВТОРИЗАЦИЯ ПО PIN ===
-function tryLogin() {
+async function tryLogin() {
   const pin = document.getElementById('pin_input').value.trim();
   
   console.log('🔑 Попытка входа с PIN:', pin);
@@ -1142,6 +1142,9 @@ function tryLogin() {
     console.log('🔄 Преобразован в 4-значный:', pinToCheck);
   }
 
+  // ✅ Перед входом проверяем обновления
+  await loadReferenceData();
+  
   const data = loadData();
   console.log('🔍 Доступные PIN-коды:', Object.keys(data.ship_pins || {}));
   
@@ -1152,35 +1155,25 @@ function tryLogin() {
     currentShip = found;
     localStorage.setItem(PIN_STORAGE_KEY, pinToCheck);
     
-    // Скрываем вход, показываем форму
     document.getElementById('login_screen').classList.add('hidden');
     document.getElementById('main_form').classList.remove('hidden');
     
-    // Заполняем карточку судна
     document.getElementById('ship_name_display').textContent = found.ship;
-    document.getElementById('captain_display').value = found.captains[0] || 'Капитан';
     
-    // ✅ НОВОЕ: Заполняем выпадающий список капитанов
+    // Заполняем выпадающий список капитанов
     const captainSelect = document.getElementById('captain_display');
     if (captainSelect && found.captains && found.captains.length > 0) {
-      // Очищаем список
       captainSelect.innerHTML = '';
-      
-      // Добавляем опции
       found.captains.forEach(captain => {
         const option = document.createElement('option');
         option.value = captain;
         option.textContent = captain;
         captainSelect.appendChild(option);
       });
-      
-      // Выбираем первого капитана по умолчанию
       captainSelect.value = found.captains[0];
     }
     
-    // Настраиваем форму под тип судна
     setupFormForShip(found.ship_type || 'self');
-    
     toast('✅ Вход выполнен: ' + found.ship);
   } else {
     console.log('❌ PIN не найден в списке');
@@ -1625,6 +1618,171 @@ function tryLogin() {
         return null;
       }
     }
+
+  // === ЗАГРУЗКА ДАННЫХ С ПРОВЕРКОЙ ИЗМЕНЕНИЙ ===
+async function loadReferenceData(forceRefresh = false) {
+  // Если нет интернета и нет принудительного обновления — берём кэш
+  if (!navigator.onLine && !forceRefresh) {
+    console.log('📴 Нет интернета, использую кэш');
+    const saved = localStorage.getItem(DATA_STORAGE_KEY);
+    if (saved) {
+      appData = JSON.parse(saved);
+      return appData;
+    }
+    return getFallbackData();
+  }
+  
+  try {
+    console.log('🔄 Проверка обновлений на сервере...');
+    const response = await fetch(API_URL);
+    const data = await response.json();
+    
+    if (data.error) {
+      console.warn('⚠️ Ошибка сервера:', data.error);
+      return loadData(); // берём кэш
+    }
+    
+    // Сравниваем с текущими данными (по количеству PIN-кодов)
+    const currentData = loadData();
+    const currentPinCount = Object.keys(currentData.ship_pins || {}).length;
+    const newPinCount = Object.keys(data.ship_pins || {}).length;
+    
+    // Проверяем, есть ли изменения
+    const hasChanges = currentPinCount !== newPinCount || 
+                       JSON.stringify(currentData.ship_pins) !== JSON.stringify(data.ship_pins);
+    
+    if (hasChanges) {
+      console.log('✅ Обнаружены изменения! Обновляем данные...');
+      console.log(`  - Было PIN-кодов: ${currentPinCount}`);
+      console.log(`  - Стало PIN-кодов: ${newPinCount}`);
+      
+      // Сохраняем новые данные
+      localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
+      appData = data;
+      
+      // Если пользователь уже вошёл — обновляем интерфейс
+      if (currentShip) {
+        const savedPin = localStorage.getItem(PIN_STORAGE_KEY);
+        if (savedPin && appData.ship_pins && appData.ship_pins[savedPin]) {
+          updateCurrentShipUI(appData.ship_pins[savedPin]);
+        }
+      }
+      
+      toast('🔄 Данные обновлены!');
+      return data;
+    } else {
+      console.log('✅ Изменений нет, данные актуальны');
+      // Обновляем время последней проверки
+      localStorage.setItem('last_check', new Date().toISOString());
+      return currentData;
+    }
+    
+  } catch (err) {
+    console.log('⚠️ Ошибка проверки:', err.message);
+    // Если ошибка — используем кэш
+    const saved = localStorage.getItem(DATA_STORAGE_KEY);
+    if (saved) {
+      appData = JSON.parse(saved);
+      return appData;
+    }
+    return getFallbackData();
+  }
+}
+
+// === ОБНОВЛЕНИЕ ТЕКУЩЕГО СУДНА ===
+function updateCurrentShipUI(shipData) {
+  if (!shipData) return;
+  
+  currentShip = shipData;
+  document.getElementById('ship_name_display').textContent = shipData.ship;
+  
+  // Обновляем список капитанов
+  const captainSelect = document.getElementById('captain_display');
+  if (captainSelect && shipData.captains && shipData.captains.length > 0) {
+    const currentValue = captainSelect.value;
+    captainSelect.innerHTML = '';
+    
+    shipData.captains.forEach(captain => {
+      const option = document.createElement('option');
+      option.value = captain;
+      option.textContent = captain;
+      captainSelect.appendChild(option);
+    });
+    
+    // Если выбранный капитан ещё есть в списке — оставляем его
+    if (currentValue && shipData.captains.includes(currentValue)) {
+      captainSelect.value = currentValue;
+    } else {
+      captainSelect.value = shipData.captains[0];
+    }
+  }
+}
+
+// === ПРИ ПОЯВЛЕНИИ СЕТИ — ПРОВЕРЯЕМ ДАННЫЕ ===
+window.addEventListener('online', async () => {
+  console.log('🌐 Появился интернет! Проверяем обновления...');
+  updateNetworkStatus();
+  
+  // Проверяем данные
+  await loadReferenceData(true);
+  
+  // Синхронизируем очередь
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.sync.register('sync-queue');
+    } catch (err) {
+      console.log('Sync error:', err);
+    }
+  }
+  await syncQueue();
+});
+
+  // === ПРИ ВОЗВРАЩЕНИИ НА СТРАНИЦУ — ПРОВЕРЯЕМ ===
+document.addEventListener('visibilitychange', async () => {
+  // Страница стала видимой И есть интернет
+  if (!document.hidden && navigator.onLine) {
+    console.log('👀 Вернулись на страницу, проверяем данные...');
+    await loadReferenceData(true);
+  }
+});
+
+  // === ИНИЦИАЛИЗАЦИЯ ===
+window.addEventListener('load', async () => {
+  console.log('🚀 Загрузка приложения...');
+  
+  loadTheme();
+  updateNetworkStatus();
+  renderQueue();
+  
+  // ✅ Загружаем данные с проверкой
+  await loadReferenceData();
+  
+  // Проверка сохраненного PIN
+  const savedPin = localStorage.getItem(PIN_STORAGE_KEY);
+  if (savedPin) {
+    document.getElementById('pin_input').value = savedPin;
+    // Небольшая задержка, чтобы данные точно загрузились
+    setTimeout(() => tryLogin(), 300);
+  }
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('✅ SW зарегистрирован');
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'sync-complete') {
+          const q = loadQueue();
+          const remaining = q.slice(event.data.sentCount);
+          saveQueue(remaining);
+          renderQueue();
+          toast(`✅ Отправлено в фоне: ${event.data.sentCount}`);
+        }
+      });
+    });
+  }
+});
+  
 </script>
 </body>
 </html>
